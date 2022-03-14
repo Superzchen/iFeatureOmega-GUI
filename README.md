@@ -15,12 +15,13 @@
 
   - Step 2. Install anaconda environment on your own machine and make sure the “Add Anaconda to the system PATH environment variable” option is selected when installation
 
-  - Step 3. Install MSMS, DSSP, RDKit and biopython
+  - Step 3. Install MSMS, DSSP, RDKit, biopython and networkx
   ```sh  
   $ conda install biopython
   $ conda install -c rdkit rdkit
   $ conda install -c salilab dssp
   $ conda install -c bioconda msms
+  $ conda install networkx
   ``` 
   **Note:** dssp and msms can not be install on Windows system.
   
