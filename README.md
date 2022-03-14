@@ -37,7 +37,7 @@
   ```sh
   # GUI version
   $ python
-  >>> from iFeatureOmega import runiFeatureOmegaGUI
+  >>> from iFeatureOmegaGUI import runiFeatureOmegaGUI
   >>> runiFeatureOmegaGUI()
   ```
 
