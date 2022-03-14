@@ -130,7 +130,7 @@ Please refer to [*iFeatureOmega* manual](https://github.com/Superzchen/iFeatureO
   >>> data.DBSCAN()                       # DBSCAN
 
   # save cluster result
-  >>> data.cluster_to_csv(nclusters=2)
+  >>> data.cluster_to_csv(file='cluster_result.csv')
 
   # dimensionality reduction
   >>> data.t_sne(n_components=2)          # t-distributed stochastic neighbor embedding
