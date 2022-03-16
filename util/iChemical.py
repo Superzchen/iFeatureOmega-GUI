@@ -6,7 +6,6 @@ from rdkit import Chem
 import numpy as np
 from chem import *
 
-
 class Ligand:
     def __init__(self, fps=[]):
         self.fps = fps
@@ -21,7 +20,7 @@ class Ligand:
                     for j, c in enumerate(code):
                         df.loc[i, fp+str(j)] = c
                 else:
-                    df.loc[i, fp] = code
+                    df.loc[i, fp] = code                    
         return df
 
 
@@ -64,8 +63,8 @@ if __name__ == '__main__':
             'radiust', 'petitjeant', 'Sito', 'Hato', 'Geto', 'Arto']
 
     kappa = ['kappa1', 'kappa2', 'kappa3', 'kappam1', 'kappam2', 'kappam3', 'phi']
-    props = ['LogP', 'MR', 'LabuteASA', 'TPSA', 'Hy', 'UI']
-
+    props = ['LogP', 'MR', 'TPSA', 'Hy', 'UI']
+    moe = ['LabuteASA', 'TPSA', 'slogPVSA', 'MRVSA', 'PEOEVSA', 'EstateVSA', 'VSAEstate']
     fps = autocor + charge + connectivity + constitue + estate + fp + topo
 
     ligand = Ligand(fps=autocor)

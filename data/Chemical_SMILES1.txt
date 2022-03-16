@@ -1,0 +1,1 @@
+CN(C)C(=O)c1cnn(-c2nc(N)c3ncn(C4OC(CO)C(O)C4O)c3n2)c1
