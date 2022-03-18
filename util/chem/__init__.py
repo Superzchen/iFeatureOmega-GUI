@@ -7,7 +7,9 @@ from .fingerprint import *
 from .topology import *
 from .kappa import *
 from .property import *
+from .basak import *
 from rdkit.Chem import Descriptors as desc
+import pandas as pd
 
 ATSm1 = CalcMoreauBroto(lag=1, tag='m')
 ATSm2 = CalcMoreauBroto(lag=2, tag='m')
@@ -183,6 +185,10 @@ Weight = desc.MolWt
 nhyd = FragCounter('[H]')
 nhal = FragCounter('[F,Cl,Br,I]')
 nhet = AllChem.CalcNumHeteroatoms
+nring = AllChem.CalcNumRings
+nrot = AllChem.CalcNumRotatableBonds
+ndonr = AllChem.CalcNumHBD
+naccr = AllChem.CalcNumHBA
 
 nhev = FragCounter('[!H]')
 ncof = FragCounter('F')
@@ -194,10 +200,6 @@ nphos = FragCounter('P')
 nsulph = FragCounter('S')
 noxy = FragCounter('O')
 nnitro = FragCounter('N')
-nring = AllChem.CalcNumRings
-nrot = AllChem.CalcNumRotatableBonds
-ndonr = AllChem.CalcNumHBD
-naccr = AllChem.CalcNumHBA
 nsb = FragCounter('[*]-[*]')
 ndb = FragCounter('[*]=[*]')
 ntb = FragCounter('[*]#[*]')
@@ -233,7 +235,11 @@ topological = CalcDaylightFingerprint
 Estate = CalcEstateFingerprint
 atompairs = CalcAtomPairsFingerprint
 torsions = CalculateTopologicalTorsionFingerprint
-morgan = CalculateMorganFingerprint
+# morgan = CalculateMorganFingerprint
+ECFP4 = CalcMorganFingerprint(radius=2, useFeatures=False)
+ECFP6 = CalcMorganFingerprint(radius=3, useFeatures=False)
+FCFP4 = CalcMorganFingerprint(radius=2, useFeatures=True)
+FCFP6 = CalcMorganFingerprint(radius=3, useFeatures=True)
 MACCS = CalculateMACCSFingerprint
 
 W = WienerIdx()
@@ -276,3 +282,36 @@ LabuteASA = MS.pyLabuteASA
 TPSA = MS.TPSA
 Hy = CalculateHydrophilicityFactor
 UI = CalculateUnsaturationIndex
+
+# Basak
+CIC0 = CalcBasakCIC0
+CIC1 = CalcBasakCICn(num_path=2)
+CIC2 = CalcBasakCICn(num_path=3)
+CIC3 = CalcBasakCICn(num_path=4)
+CIC4 = CalcBasakCICn(num_path=5)
+CIC5 = CalcBasakCICn(num_path=6)
+CIC6 = CalcBasakCICn(num_path=7)
+SIC0 = CalcBasakSIC0
+SIC1 = CalcBasakSICn(num_path=2)
+SIC2 = CalcBasakSICn(num_path=3)
+SIC3 = CalcBasakSICn(num_path=4)
+SIC4 = CalcBasakSICn(num_path=5)
+SIC5 = CalcBasakSICn(num_path=6)
+SIC6 = CalcBasakSICn(num_path=7)
+IC0 = CalcBasakIC0
+IC1 = CalcBasakICn(num_path=2)
+IC2 = CalcBasakICn(num_path=3)
+IC3 = CalcBasakICn(num_path=4)
+IC4 = CalcBasakICn(num_path=5)
+IC5 = CalcBasakICn(num_path=6)
+IC6 = CalcBasakICn(num_path=7)
+
+# Burden
+from .burden import *
+bcutp = CalcBurden(label='alpha')
+bcute = CalcBurden(label='En')
+bcutv = CalcBurden(label='V')
+bcutm = CalcBurden(label='m')
+
+# Pharmacophore
+from .cats import *

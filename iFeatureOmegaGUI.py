@@ -261,13 +261,20 @@ class IFeatureOmegaGui(QTabWidget):
                'ATSp1', 'ATSp2', 'ATSp3', 'ATSp4', 'ATSp5', 'ATSp6', 'ATSp7', 'ATSp8'],
             'Molecular properties': ['LogP', 'MR', 'LabuteASA', 'TPSA', 'Hy', 'UI'],            
             'Charge': ['SPP', 'LDI', 'Rnc', 'Rpc', 'Mac', 'Tac', 'Mnc', 'Tnc', 'Mpc', 'Tpc', 'Qass', 'QOss', 'QNss', 'QCss', 'QHss', 'Qmin', 'QOmin', 'QNmin', 'QCmin', 'QHmin', 'Qmax', 'QOmax', 'QNmax', 'QCmax', 'QHmax'],
-            'Moe-Type descriptors': [],
+            'Moe-Type descriptors': ['LabuteASA', 'TPSA', 'slogPVSA', 'MRVSA', 'PEOEVSA', 'EstateVSA', 'VSAEstate'],
             'Daylight-type fingerprints': ['topological'],
             'MACCS fingerprints': ['MACCS'],
             'Atom pairs fingerprints': ['atompairs'],
             'Morgan fingerprints': ['morgan'],
             'TopologicalTorsion fingerprints': ['torsions'],
             'E-state fingerprints': ['Estate'],
+            'Basak': ["CIC0", "CIC1", "CIC2", "CIC3", "CIC4", "CIC5", "CIC6", "SIC0", "SIC1", "SIC2", "SIC3", "SIC4", "SIC5", "SIC6", "IC0", "IC1", "IC2", "IC3", "IC4", "IC5", "IC6"],
+            'Burden': ['bcutp', 'bcute', 'bcutv', 'bcutm'],
+            'Pharmacophore': ['CalcCATS'],
+            'Morgan-ECFP4 fingerprints': ['ECFP4'],
+            'Morgan-ECFP6 fingerprints': ['ECFP6'],
+            'Morgan-FCFP4 fingerprints': ['FCFP4'],
+            'Morgan-FCFP6 fingerprints': ['FCFP6'],
         }
 
         # Analysis
@@ -1640,6 +1647,15 @@ class IFeatureOmegaGui(QTabWidget):
         self.Chemical.setExpanded(True)
         self.Chemical.setText(0, 'Chemical')
         self.Chemical.setDisabled(True)
+        basak = QTreeWidgetItem(self.Chemical)
+        basak.setText(0, 'Basak')
+        basak.setCheckState(0, Qt.Unchecked)
+        burden = QTreeWidgetItem(self.Chemical)
+        burden.setText(0, 'Burden')
+        burden.setCheckState(0, Qt.Unchecked)
+        pharm = QTreeWidgetItem(self.Chemical)
+        pharm.setText(0, 'Pharmacophore')
+        pharm.setCheckState(0, Qt.Unchecked)
         constitution = QTreeWidgetItem(self.Chemical)
         constitution.setText(0, 'Constitution')
         constitution.setCheckState(0, Qt.Unchecked)
@@ -1673,21 +1689,30 @@ class IFeatureOmegaGui(QTabWidget):
         moetype = QTreeWidgetItem(self.Chemical)
         moetype.setText(0, 'Moe-Type descriptors')
         moetype.setCheckState(0, Qt.Unchecked)
-        daylight_fp = QTreeWidgetItem(self.Chemical)
-        daylight_fp.setText(0, 'Daylight-type fingerprints')
-        daylight_fp.setCheckState(0, Qt.Unchecked)
+        # daylight_fp = QTreeWidgetItem(self.Chemical)
+        # daylight_fp.setText(0, 'Daylight-type fingerprints')
+        # daylight_fp.setCheckState(0, Qt.Unchecked)
         maccs_fp = QTreeWidgetItem(self.Chemical)
         maccs_fp.setText(0, 'MACCS fingerprints')
         maccs_fp.setCheckState(0, Qt.Unchecked)
-        atompairs_fp = QTreeWidgetItem(self.Chemical)
-        atompairs_fp.setText(0, 'Atom pairs fingerprints')
-        atompairs_fp.setCheckState(0, Qt.Unchecked)
-        morgan_fp = QTreeWidgetItem(self.Chemical)
-        morgan_fp.setText(0, 'Morgan fingerprints')
-        morgan_fp.setCheckState(0, Qt.Unchecked)
-        topologicaltorsion_fp = QTreeWidgetItem(self.Chemical)
-        topologicaltorsion_fp.setText(0, 'TopologicalTorsion fingerprints')
-        topologicaltorsion_fp.setCheckState(0, Qt.Unchecked)
+        # atompairs_fp = QTreeWidgetItem(self.Chemical)
+        # atompairs_fp.setText(0, 'Atom pairs fingerprints')
+        # atompairs_fp.setCheckState(0, Qt.Unchecked)
+        morgan_fp1 = QTreeWidgetItem(self.Chemical)
+        morgan_fp1.setText(0, 'Morgan-ECFP4 fingerprints')
+        morgan_fp1.setCheckState(0, Qt.Unchecked)
+        morgan_fp2 = QTreeWidgetItem(self.Chemical)
+        morgan_fp2.setText(0, 'Morgan-ECFP6 fingerprints')
+        morgan_fp2.setCheckState(0, Qt.Unchecked)
+        morgan_fp3 = QTreeWidgetItem(self.Chemical)
+        morgan_fp3.setText(0, 'Morgan-FCFP4 fingerprints')
+        morgan_fp3.setCheckState(0, Qt.Unchecked)
+        morgan_fp4 = QTreeWidgetItem(self.Chemical)
+        morgan_fp4.setText(0, 'Morgan-FCFP6 fingerprints')
+        morgan_fp4.setCheckState(0, Qt.Unchecked)
+        # topologicaltorsion_fp = QTreeWidgetItem(self.Chemical)
+        # topologicaltorsion_fp.setText(0, 'TopologicalTorsion fingerprints')
+        # topologicaltorsion_fp.setCheckState(0, Qt.Unchecked)
         estate_fp = QTreeWidgetItem(self.Chemical)
         estate_fp.setText(0, 'E-state fingerprints')
         estate_fp.setCheckState(0, Qt.Unchecked)
@@ -3146,46 +3171,46 @@ class IFeatureOmegaGui(QTabWidget):
             QMessageBox.warning(self, 'Warning', 'Please check your input!', QMessageBox.Ok | QMessageBox.No, QMessageBox.Ok)
         
     def calculate_chemical_descriptor(self):
-        # try:
-        self.setDisabled(True)
-        self.chemical_encodings = None
-        with open(self.chemical_smiles_file) as f:
-            smiles_list = f.read().strip().split('\n')
-        
-        mol_list = []
-        no_error = True
-        for mol in smiles_list:
-            molObj = Chem.MolFromSmiles(mol)
-            if molObj is not None:
-                mol_list.append(molObj)
+        try:
+            self.setDisabled(True)
+            self.chemical_encodings = None
+            with open(self.chemical_smiles_file) as f:
+                smiles_list = f.read().strip().split('\n')
+            
+            mol_list = []
+            no_error = True
+            for mol in smiles_list:
+                molObj = Chem.MolFromSmiles(mol)
+                if molObj is not None:
+                    mol_list.append(molObj)
+                else:
+                    no_error = False
+            if no_error:
+                fps = []
+                for desc in self.chemical_selected_descriptors:
+                    if desc in self.chemical_default_parameters:
+                        fps += self.chemical_default_parameters[desc]
+                ligand = iChemical.Ligand(fps=fps)
+                df = ligand(mol_list)
+                if len(df) == len(smiles_list):
+                    df.insert(0, 'SMILES', np.array(smiles_list))                    
+                    self.chemical_encodings = df
+                    self.chemical_message_signal.emit('Descriptor calculate complete.')
+                    self.chemical_display_signal.emit()
+                else:
+                    self.display_error_signal.emit('Descriptor calculate failed.')                    
+                    self.chemical_panel_clear()                    
+                    self.setDisabled(False)
+                    self.chemical_progress_bar.clear()
             else:
-                no_error = False
-        if no_error:
-            fps = []
-            for desc in self.chemical_selected_descriptors:
-                if desc in self.chemical_default_parameters:
-                    fps += self.chemical_default_parameters[desc]
-            ligand = iChemical.Ligand(fps=fps)
-            df = ligand(mol_list)
-            if len(df) == len(smiles_list):
-                df.insert(0, 'SMILES', np.array(smiles_list))                    
-                self.chemical_encodings = df
-                self.chemical_message_signal.emit('Descriptor calculate complete.')
-                self.chemical_display_signal.emit()
-            else:
-                self.display_error_signal.emit('Descriptor calculate failed.')                    
-                self.chemical_panel_clear()                    
+                self.display_warning_signal.emit('Failed parsing SMILES.')                
+                self.chemical_panel_clear()
                 self.setDisabled(False)
                 self.chemical_progress_bar.clear()
-        else:
-            self.display_warning_signal.emit('Failed parsing SMILES.')                
-            self.chemical_panel_clear()
+        except Exception as e:
+            self.display_error_signal.emit(str(e))            
             self.setDisabled(False)
             self.chemical_progress_bar.clear()
-        # except Exception as e:
-        #     self.display_error_signal.emit(str(e))            
-        #     self.setDisabled(False)
-        #     self.chemical_progress_bar.clear()
 
     def set_chemical_table_content(self):
         if self.chemical_encodings is not None:

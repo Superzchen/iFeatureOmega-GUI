@@ -32,9 +32,9 @@ def CalcDaylightFingerprint(mol, **kwargs):
         is the DataStructs which is used for calculating the similarity.
     #################################################################
     """
-    # NumFinger = 2048
+    res = np.zeros(128)
+    # NumFinger = 128
     bv = FingerprintMols.FingerprintMol(mol)
-    res = np.zeros(2048)
     DataStructs.ConvertToNumpyArray(bv, res)
 
     return res
@@ -87,9 +87,14 @@ def CalcEstateFingerprint(mol, **kwargs):
         is the DataStructs which is used for calculating the similarity.
     #################################################################
     """
-    res = EstateFingerprint(mol, **kwargs)
-    res = (res > 0).astype(float)
-    return res
+    NumFinger = 79
+    res = {}
+    temp = EstateFingerprint(mol, **kwargs)
+    for i in temp:
+        if temp[i] > 0:
+            res[i[7:]] = 1
+
+    return temp
 
 
 def CalcAtomPairsFingerprint(mol, **kwargs):
@@ -113,7 +118,7 @@ def CalcAtomPairsFingerprint(mol, **kwargs):
     #################################################################
     """
     res = np.zeros(1)
-    bv = Pairs.GetAtomPairFingerprint(mol, maxLength=10)
+    bv = Pairs.GetAtomPairFingerprint(mol)
     DataStructs.ConvertToNumpyArray(bv, res)
     return res
 
@@ -138,45 +143,36 @@ def CalculateTopologicalTorsionFingerprint(mol, **kwargs):
         is the DataStructs which is used for calculating the similarity.
     #################################################################
     """
-    res = np.zeros(1)
-    bv = Torsions.GetTopologicalTorsionFingerprint(mol)
-    DataStructs.ConvertToNumpyArray(bv, res)
-    return res
+    res = Torsions.GetTopologicalTorsionFingerprint(mol)
+
+    return res.GetLength(), res.GetNonzeroElements(), res
 
 
-class CalcMorganFingerprint:
-    def __init__(self, nbits=2048, radius=3, useFeatures=True):
-        self.nbits = nbits
-        self.radius = radius
-        self.useFeatures = useFeatures
+def CalculateMorganFingerprint(mol, **kwargs):
+    """
+    #################################################################
+    Calculate Morgan
 
-    def __call__(self, mol, **kwargs):
-        """
-        #################################################################
-        Calculate Morgan
+    Usage:
 
-        Usage:
+        result=CalculateMorganFingerprint(mol)
 
-            result=CalculateMorganFingerprint(mol)
+        Input: mol is a molecule object.
 
-            Input: mol is a molecule object.
+        radius is a radius.
 
-            radius is a radius.
+        Output: result is a tuple form. The first is the number of
 
-            Output: result is a tuple form. The first is the number of
+        fingerprints. The second is a dict form whose keys are the
 
-            fingerprints. The second is a dict form whose keys are the
+        position which this molecule has some substructure. The third
 
-            position which this molecule has some substructure. The third
+        is the DataStructs which is used for calculating the similarity.
+    #################################################################
+    """
+    res = AllChem.GetMorganFingerprint(mol, 2)
 
-            is the DataStructs which is used for calculating the similarity.
-        #################################################################
-        """
-        bv = AllChem.GetMorganFingerprintAsBitVect(mol, self.radius, self.nbits, useFeatures=self.useFeatures)
-        res = np.zeros(self.nbits)
-        DataStructs.ConvertToNumpyArray(bv, res)
-
-        return res
+    return res.GetLength(), res.GetNonzeroElements(), res
 
 
 def CalculateSimilarity(fp1, fp2, similarity="Tanimoto"):
