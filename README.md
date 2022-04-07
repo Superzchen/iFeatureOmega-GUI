@@ -56,7 +56,7 @@
  
 
 ## Brief guidance to use (GUI version):  
-Please refer to [*iFeatureOmega* manual](https://github.com/Superzchen/iFeatureOmegaGUI/blob/main/docs/iFeatureOmega_manual.pdf ) for detailed usage.
+Please refer to [*iFeatureOmega* manual](https://github.com/Superzchen/iFeatureOmega-GUI/blob/main/docs/iFeatureOmega_manual.pdf) for detailed usage.
   
 ## *iFeatureOmegaGUI* interfaces:
 
