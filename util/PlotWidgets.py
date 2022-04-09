@@ -129,6 +129,94 @@ class ClusteringDiagramMatplotlib(QWidget):
         self.fig.spines['left'].set_color('black')
         self.fig.spines['bottom'].set_color('black')
 
+
+# Cluster diagram for sub groups
+class ClusteringDiagramMatplotlibSub(QWidget):
+    def __init__(self):
+        super(ClusteringDiagramMatplotlibSub, self).__init__()
+        self.fontdict = {
+            'family': 'Arial',
+            'size': 16,
+            'color': '#282828',
+        }
+        self.colorlist = ['#E41A1C', '#377EB8', '#4DAF4A', '#984EA3', '#FF7F00', '#FFFF33', '#A65628', '#F781BF',
+                          '#999999']
+        self.marklist = ['o'] * 9 + ['v'] * 9 + ['^'] * 9 + ['+'] * 9
+        self.x_axis = 0
+        self.y_axis = 1
+        self.initUI()
+
+    def initUI(self):
+        self.setWindowTitle('Scatter plot')
+        self.setWindowIcon(QIcon('images/logo.ico'))
+        self.resize(800, 600)
+        layout = QVBoxLayout(self)
+        self.figureCanvas = MyFigureCanvas()
+        layout.addWidget(self.figureCanvas)
+        self.navigationToolbar = NavigationToolbar2QT(self.figureCanvas, self)
+        spacer = QSpacerItem(20, 10, QSizePolicy.Expanding, QSizePolicy.Minimum)
+        self.comboBox_PC1 = QComboBox()
+        self.comboBox_PC1.setFont(QFont('Arial', 8))
+        self.comboBox_PC2 = QComboBox()
+        self.comboBox_PC2.setFont(QFont('Arial', 8))
+        self.replotBtn = QPushButton(' Redraw ')
+        self.replotBtn.setFont(QFont('Arial', 8))
+        self.replotBtn.clicked.connect(self.re_drawplot)
+
+        hLayout = QHBoxLayout()
+        hLayout.addStretch(1)
+        hLayout.addWidget(self.navigationToolbar)
+        hLayout.addItem(spacer)
+        hLayout.addWidget(self.comboBox_PC1)
+        hLayout.addWidget(self.comboBox_PC2)
+        hLayout.addWidget(self.replotBtn)
+        hLayout.addStretch(1)
+        layout.addLayout(hLayout)
+
+    def init_data(self, method, data, xlabel=None, ylabel=None):
+        self.xlabel = 'Component 1'
+        self.ylabel = 'Component 2'
+        self.method = method
+        self.prefix = 'Cluster:' if method == 'Clustering' else 'Sample category:'
+        self.data = data
+        self.PCs = ['PC_{0}'.format(i+1) for i in range(data[0][1].shape[1])]
+        self.comboBox_PC1.addItems(self.PCs)
+        self.comboBox_PC2.addItems(self.PCs)
+        self.comboBox_PC2.setCurrentIndex(1)
+        self.fig = self.figureCanvas.figure.add_subplot(111)
+        self.__draw_figure__(0, 1)
+
+    def __draw_figure__(self, x, y):
+        self.fig.cla()
+        self.fig.set_facecolor('white')
+        self.fig.set_title(self.method)
+        self.fig.set_xlabel(self.xlabel, fontdict=self.fontdict)
+        self.fig.set_ylabel(self.ylabel, fontdict=self.fontdict)
+        self.fig.tick_params(axis='y', left=True, right=False)
+        self.fig.tick_params(axis='x', top=False, bottom=True)
+        for i, item in enumerate(self.data):
+            self.fig.scatter(item[1][:, x], item[1][:, y], color=self.colorlist[i % len(self.colorlist)], s=70,
+                             marker=self.marklist[i % len(self.marklist)], label='%s %s' % (self.prefix, item[0]),
+                             edgecolor="w")
+        self.fig.legend()
+        labels = self.fig.get_xticklabels() + self.fig.get_yticklabels()
+        [label.set_color('#282828') for label in labels]
+        [label.set_fontname('Arial') for label in labels]
+        [label.set_size(16) for label in labels]
+        self.fig.spines['left'].set_color('black')
+        self.fig.spines['bottom'].set_color('black')
+
+    def re_drawplot(self):
+        self.x_axis = int(self.comboBox_PC1.currentIndex())
+        self.y_axis = int(self.comboBox_PC2.currentIndex())
+        self.xlabel = 'Component %s' %(self.x_axis + 1)
+        self.ylabel = 'Component %s' %(self.y_axis + 1)
+        self.__draw_figure__(self.x_axis, self.y_axis)
+        width = self.geometry().width()
+        height = self.geometry().height()
+        self.resize(width-1, height-1)
+
+
 # Histogram
 class HistogramWidget(QWidget):
     def __init__(self):
@@ -142,7 +230,7 @@ class HistogramWidget(QWidget):
         self.initUI()
 
     def initUI(self):
-        self.setWindowTitle('iLearnPlus Histogram')
+        self.setWindowTitle('iFeatureOmega Histogram')
         self.setWindowIcon(QIcon('images/logo.ico'))
         self.resize(800, 600)
         layout = QVBoxLayout(self)
@@ -214,7 +302,7 @@ class HistogramWidget2(QWidget):
         self.initUI()
 
     def initUI(self):
-        self.setWindowTitle('iLearnPlus Histogram')
+        self.setWindowTitle('iFeatureOmega Histogram')
         self.setWindowIcon(QIcon('images/logo.ico'))
         self.resize(800, 600)
         layout = QVBoxLayout(self)
@@ -287,7 +375,7 @@ class CurveWidget(QWidget):
         self.initUI()
 
     def initUI(self):
-        self.setWindowTitle('iLearnPlus Curve')
+        self.setWindowTitle('iFeatureOmega Curve')
         self.setWindowIcon(QIcon('images/logo.ico'))
         self.resize(800, 600)
         layout = QVBoxLayout(self)
@@ -364,7 +452,7 @@ class CurvesWidget(QWidget):
         self.initUI()
 
     def initUI(self):
-        self.setWindowTitle('iLearnPlus Curve')
+        self.setWindowTitle('iFeatureOmega Curve')
         self.setWindowIcon(QIcon('images/logo.ico'))
         self.resize(800, 600)
         layout = QVBoxLayout(self)
@@ -486,7 +574,7 @@ class CustomCurveWidget(QWidget):
         self.initUI()
 
     def initUI(self):
-        self.setWindowTitle('iLearnPlus Curve')
+        self.setWindowTitle('iFeatureOmega Curve')
         self.setWindowIcon(QIcon('images/logo.ico'))
         self.resize(800, 600)
         layout = QVBoxLayout(self)
@@ -575,7 +663,7 @@ class BoxplotWidget(QWidget):
         self.initUI()
 
     def initUI(self):
-        self.setWindowTitle('iLearnPlus Boxplot')
+        self.setWindowTitle('iFeatureOmega Boxplot')
         self.setWindowIcon(QIcon('images/logo.ico'))
         self.resize(800, 600)
         layout = QVBoxLayout(self)
@@ -738,7 +826,7 @@ class SingleBoxplotWidget(QWidget):
         self.__draw_heatmap__()
 
     def initUI(self):
-        self.setWindowTitle('iLearnPlus Boxplot')
+        self.setWindowTitle('iFeatureOmega Boxplot')
         self.setWindowIcon(QIcon('images/logo.ico'))
         self.resize(900, 600)
         layout = QVBoxLayout(self)
@@ -933,7 +1021,7 @@ class CustomSingleBoxplotWidget(QWidget):
         self.__draw_figure__()
 
     def initUI(self):
-        self.setWindowTitle('iLearnPlus Boxplot')
+        self.setWindowTitle('iFeatureOmega Boxplot')
         self.setWindowIcon(QIcon('images/logo.ico'))
         self.resize(600, 400)
         layout = QVBoxLayout(self)
@@ -1309,7 +1397,7 @@ class HeatmapWidget(QWidget):
         self.__draw_heatmap__()
 
     def initUI(self):
-        self.setWindowTitle('iLearnPlus Heatmap')
+        self.setWindowTitle('iFeatureOmega Heatmap')
         self.setWindowIcon(QIcon('images/logo.ico'))
         self.resize(800, 600)
         layout = QVBoxLayout(self)
@@ -1355,6 +1443,122 @@ class HeatmapWidget(QWidget):
         self.figureCanvas.figure.subplots_adjust(left=0.1, right=0.95, bottom=0.15, top=0.95, wspace=0.5, hspace=0.5)
 
 
+class HeatmapWidgetSub(QWidget):
+    def __init__(self):
+        super(HeatmapWidgetSub, self).__init__()
+        self.setStyleSheet(qdarkstyle.load_stylesheet_pyqt5())
+        self.dataframe = None
+        self.maxmum_samples = 30
+        self.initUI()       
+
+    def initUI(self):
+        self.setWindowTitle('iFeatureOmega Heatmap')
+        self.setWindowIcon(QIcon('images/logo.ico'))
+        self.resize(800, 600)
+        layout = QVBoxLayout(self)
+        self.figureCanvas = MyFigureCanvas()
+        self.navigationToolbar = NavigationToolbar2QT(self.figureCanvas, self)
+        hLayout = QHBoxLayout()
+        hLayout.addStretch(1)
+        hLayout.addWidget(self.navigationToolbar)
+        hLayout.addStretch(1)
+        layout.addWidget(self.figureCanvas)
+        layout.addLayout(hLayout)
+
+
+    def init_data(self, dataframe):
+        self.dataframe = dataframe
+        self.data_range = [0, self.maxmum_samples]
+        if len(self.dataframe) < self.maxmum_samples:
+            self.data_range[1] = len(self.dataframe)
+        self.heatmap = self.figureCanvas.figure.add_subplot(111)        
+        self.__draw_heatmap__(self.data_range)
+
+        # add color bar
+        # self.figureCanvas.figure.colorbar(self.im)
+
+        # sample selection       
+        # self.selector_sample = self.figureCanvas.figure.add_axes([0.05, 0.2, 0.01, 0.6])
+        # self.selector_sample.set_ylabel('Select sample range (maximum range: %s)'%self.maxmum_samples, fontfamily='Arial', fontsize=12, rotation=90)
+        # self.selector_sample.set_facecolor('white')
+        # self.selector_sample.set_xlim(-0.5, 0.5)
+        # self.selector_sample.set_ylim(0, self.dataframe.values.shape[0] + 1)
+        # self.selector_sample.axvline(linewidth=8, color='#AFEEEE')
+        # self.selector_sample.set_xticks([])
+        # ticks = [0, self.dataframe.values.shape[0]]
+        # self.selector_sample.set_yticks(ticks)
+        # self.span_sample = SpanSelector(self.selector_sample, self.onselect_sample, 'vertical', useblit=True, span_stays=True, rectprops=dict(facecolor='#48D1CC'))
+
+    def __draw_heatmap__(self, data_range, init_state=True):
+        data = self.dataframe.iloc[data_range[0]: data_range[1]].T
+        correlation_matrix = data.corr(method='pearson').values        
+        self.heatmap.cla()
+        self.heatmap.set_facecolor('white')
+        self.heatmap.grid(False)
+        self.heatmap.set_title('Feature similarity matrix', fontfamily='Arial', fontsize=12)
+        self.heatmap.tick_params(axis=u'both', which=u'both', length=0)  # tick length = 0
+        tick = range(len(data.columns))
+        self.heatmap.set_yticks(tick)
+        self.heatmap.set_yticklabels(data.columns)
+        self.heatmap.set_xticks(tick)
+        self.heatmap.set_xticklabels(data.columns, rotation=45)
+        self.im = self.heatmap.imshow(correlation_matrix, cmap=plt.cm.winter, alpha=0.6)        
+
+        if correlation_matrix.shape[0] <= 5:
+            fontsize = 10
+        elif 5 < correlation_matrix.shape[0] <= 10:
+            fontsize = 8
+        else:
+            fontsize = 5
+        for i in range(correlation_matrix.shape[0]):
+            for j in range(i):
+                self.heatmap.text(j, i, '%.4f' %correlation_matrix[i][j], fontsize=fontsize, family='Arial', style='italic', color='#101010', ha='center', va='center')
+        labels = self.heatmap.get_xticklabels() + self.heatmap.get_yticklabels()
+        [label.set_color('#282828') for label in labels]
+        [label.set_fontname('Arial') for label in labels]
+        [label.set_size(11) for label in labels]      
+
+        self.figureCanvas.figure.subplots_adjust(left=0.1, right=0.95, bottom=0.15, top=0.95, wspace=0.5, hspace=0.5)
+
+        if init_state == True:
+            # add 
+            self.figureCanvas.figure.colorbar(self.im)
+
+            # sample selection       
+            self.selector_sample = self.figureCanvas.figure.add_axes([0.05, 0.2, 0.01, 0.6])
+            self.selector_sample.set_ylabel('Select sample range (maximum range: %s)'%self.maxmum_samples, fontfamily='Arial', fontsize=12, rotation=90)
+            self.selector_sample.set_facecolor('white')
+            self.selector_sample.set_xlim(-0.5, 0.5)
+            self.selector_sample.set_ylim(0, self.dataframe.values.shape[0] + 1)
+            self.selector_sample.axvline(linewidth=8, color='#AFEEEE')
+            self.selector_sample.set_xticks([])
+            ticks = [0, self.dataframe.values.shape[0]]
+            self.selector_sample.set_yticks(ticks)
+            self.span_sample = SpanSelector(self.selector_sample, self.onselect_sample, 'vertical', useblit=True, span_stays=True, rectprops=dict(facecolor='#48D1CC'))
+
+
+    def check_range(self, vmin, vmax):
+        if vmax - vmin + 1 > self.maxmum_samples:
+            vmax = vmin + self.maxmum_samples + 1
+        return (int(vmin), int(vmax))
+
+    def onselect_sample(self, xmin, xmax):
+        xmin = int(xmin)
+        xmax = int(xmax)        
+        if xmin < 0:
+            xmin = 0
+        if xmax > len(self.dataframe):
+            xmax = len(self.dataframe)
+
+        if xmax - xmin + 1 > self.maxmum_samples:
+            QMessageBox.warning(self, 'Warning', 'The span range should be [0, %s].' %self.maxmum_samples, QMessageBox.Ok | QMessageBox.No, QMessageBox.Ok)
+        elif xmax == xmin:
+            pass
+        else:
+            self.data_range = [xmin, xmax]            
+            self.__draw_heatmap__([xmin, xmax], False)
+
+
 class CustomHeatmapWidget(QWidget):
     def __init__(self, dataframe, x_label, y_label):
         super(CustomHeatmapWidget, self).__init__()
@@ -1371,7 +1575,7 @@ class CustomHeatmapWidget(QWidget):
         self.__draw_heatmap__()
 
     def initUI(self):
-        self.setWindowTitle('iLearnPlus Heatmap')
+        self.setWindowTitle('iFeatureOmega Heatmap')
         self.setWindowIcon(QIcon('images/logo.ico'))
         self.resize(800, 600)
         layout = QVBoxLayout(self)
@@ -1656,7 +1860,7 @@ class BootstrapTestWidget(QWidget):
         self.initUI()
 
     def initUI(self):
-        self.setWindowTitle('iLearnPlus Bootstrap test')
+        self.setWindowTitle('iFeatureOmega Bootstrap test')
         self.setWindowIcon(QIcon('images/logo.ico'))
         self.resize(800, 600)
         layout = QVBoxLayout(self)
@@ -1711,7 +1915,7 @@ class BootstrapTestWidget(QWidget):
         self.displayPlot()
 
     def displayPlot(self):
-        self.setWindowTitle('iLearnPlus Bootstrap test')
+        self.setWindowTitle('iFeatureOmega Bootstrap test')
         if not self.dataframe is None:
             self.heatmap = self.figureCanvas.figure.add_subplot(111)
             self.heatmap.cla()
@@ -2021,9 +2225,11 @@ class CircosWidget(QWidget):
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)
-    df1 = pd.read_csv('../data/Data_for_boxplot.tsv', sep='\t', header=0, index_col=None)
-    print(df1)
-    win = BoxplotSpanSelector_multiSamples()
-    win.init_data(df1, 'x', 'y')
+    df1 = pd.read_csv('../data/sample.tsv', sep='\t', header=0, index_col=0)
+    # print(df1)
+    win = HeatmapWidgetSub()
+    win.init_data(df1)
+    # win.init_data('Clustering', [[0, df1.values]], 'x', 'y')
+    win.setStyleSheet(qdarkstyle.load_stylesheet_pyqt5())
     win.show()    
     sys.exit(app.exec_())

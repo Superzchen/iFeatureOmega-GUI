@@ -767,11 +767,19 @@ class IFeatureOmegaGui(QTabWidget):
         self.protein_relation = PlotWidgets.CircosWidget()
         self.protein_relation_layout.addWidget(self.protein_relation)
 
+        # similarity matrix
+        self.protein_similarity_widget = QWidget()
+        self.protein_similarity_layout = QVBoxLayout(self.protein_similarity_widget)
+        self.protein_similarity = PlotWidgets.HeatmapWidgetSub()
+        self.protein_similarity_layout.addWidget(self.protein_similarity)
+        
+
         self.protein_viewWidget.addTab(self.protein_desc_tableWidget, ' Data ')
         self.protein_viewWidget.addTab(self.protein_desc_histWidget, ' Data distribution ')
         self.protein_viewWidget.addTab(self.protein_heatmap_widget, ' Heatmap ')
         self.protein_viewWidget.addTab(self.protein_boxplot_widget, ' Boxplot ')
         self.protein_viewWidget.addTab(self.protein_relation_widget, ' Circular plot ')
+        self.protein_viewWidget.addTab(self.protein_similarity_widget, ' Similarity matrix ')
 
         # splitter
         splitter_1 = QSplitter(Qt.Horizontal)
@@ -1113,14 +1121,20 @@ class IFeatureOmegaGui(QTabWidget):
         self.dna_relation_widget = QWidget()
         self.dna_relation_layout = QVBoxLayout(self.dna_relation_widget)
         self.dna_relation = PlotWidgets.CircosWidget()
-        self.dna_relation_layout.addWidget(self.dna_relation)		
+        self.dna_relation_layout.addWidget(self.dna_relation)
+
+        # similarity matrix
+        self.dna_similarity_widget = QWidget()
+        self.dna_similarity_layout = QVBoxLayout(self.dna_similarity_widget)
+        self.dna_similarity = PlotWidgets.HeatmapWidgetSub()
+        self.dna_similarity_layout.addWidget(self.dna_similarity)
 		
         self.dna_viewWidget.addTab(self.dna_desc_tableWidget, ' Data ')
         self.dna_viewWidget.addTab(self.dna_desc_histWidget, ' Data distribution ')
         self.dna_viewWidget.addTab(self.dna_heatmap_widget, ' Heatmap ')
         self.dna_viewWidget.addTab(self.dna_boxplot_widget, ' Boxplot ')
-        self.dna_viewWidget.addTab(self.dna_relation_widget, ' Relations plot ')
-
+        self.dna_viewWidget.addTab(self.dna_relation_widget, ' Circular plot ')
+        self.dna_viewWidget.addTab(self.dna_similarity_widget, ' Similarity matrix ')
 
         # splitter
         splitter_1 = QSplitter(Qt.Horizontal)
@@ -1409,11 +1423,18 @@ class IFeatureOmegaGui(QTabWidget):
         self.rna_relation = PlotWidgets.CircosWidget()
         self.rna_relation_layout.addWidget(self.rna_relation)
 
+        # similarity matrix
+        self.rna_similarity_widget = QWidget()
+        self.rna_similarity_layout = QVBoxLayout(self.rna_similarity_widget)
+        self.rna_similarity = PlotWidgets.HeatmapWidgetSub()
+        self.rna_similarity_layout.addWidget(self.rna_similarity)
+
         self.rna_viewWidget.addTab(self.rna_desc_tableWidget, ' Data ')
         self.rna_viewWidget.addTab(self.rna_desc_histWidget, ' Data distribution ')
         self.rna_viewWidget.addTab(self.rna_heatmap_widget, ' Heatmap ')
         self.rna_viewWidget.addTab(self.rna_boxplot_widget, ' Boxplot ')
-        self.rna_viewWidget.addTab(self.rna_relation_widget, ' Relations plot ')
+        self.rna_viewWidget.addTab(self.rna_relation_widget, ' Circular plot ')
+        self.rna_viewWidget.addTab(self.rna_similarity_widget, " Similarity matrix ")
 
         # splitter
         splitter_1 = QSplitter(Qt.Horizontal)
@@ -1574,11 +1595,18 @@ class IFeatureOmegaGui(QTabWidget):
         self.structure_relation = PlotWidgets.CircosWidget()
         self.structure_relation_layout.addWidget(self.structure_relation)
 
+        # similarity matrix
+        self.structure_similarity_widget = QWidget()
+        self.structure_similarity_layout = QVBoxLayout(self.structure_similarity_widget)
+        self.structure_similarity = PlotWidgets.HeatmapWidgetSub()
+        self.structure_similarity_layout.addWidget(self.structure_similarity)
+
         self.structure_viewWidget.addTab(self.structure_desc_tableWidget, ' Data ')
         self.structure_viewWidget.addTab(self.structure_desc_histWidget, ' Data distribution ')
         self.structure_viewWidget.addTab(self.structure_heatmap_widget, ' Heatmap ')
         self.structure_viewWidget.addTab(self.structure_boxplot_widget, ' Boxplot ')
-        self.structure_viewWidget.addTab(self.structure_relation_widget, ' Relations plot ')
+        self.structure_viewWidget.addTab(self.structure_relation_widget, ' Circular plot ')
+        self.structure_viewWidget.addTab(self.structure_similarity_widget, ' Similarity matrix ')
 
         # splitter
         splitter_1 = QSplitter(Qt.Horizontal)
@@ -1765,11 +1793,18 @@ class IFeatureOmegaGui(QTabWidget):
         self.chemical_relation = PlotWidgets.CircosWidget()
         self.chemical_relation_layout.addWidget(self.chemical_relation)
 
+        # similarity matrix
+        self.chemical_similarity_widget = QWidget()
+        self.chemical_similarity_layout = QVBoxLayout(self.chemical_similarity_widget)
+        self.chemical_similarity = PlotWidgets.HeatmapWidgetSub()
+        self.chemical_similarity_layout.addWidget(self.chemical_similarity)
+
         self.chemical_viewWidget.addTab(self.chemical_desc_tableWidget, ' Data ')
         self.chemical_viewWidget.addTab(self.chemical_desc_histWidget, ' Data distribution ')
         self.chemical_viewWidget.addTab(self.chemical_heatmap_widget, ' Heatmap ')
         self.chemical_viewWidget.addTab(self.chemical_boxplot_widget, ' Boxplot ')
-        self.chemical_viewWidget.addTab(self.chemical_relation_widget, ' Relations plot ')        
+        self.chemical_viewWidget.addTab(self.chemical_relation_widget, ' Circular plot ')
+        self.chemical_viewWidget.addTab(self.chemical_similarity_widget, ' Similarity matrix ') 
 
         # splitter
         splitter_1 = QSplitter(Qt.Horizontal)
@@ -1926,11 +1961,12 @@ class IFeatureOmegaGui(QTabWidget):
         self.analysis_start_button = QPushButton('Start')        
         self.analysis_start_button.setFont(QFont('Arial', 10))
         self.analysis_start_button.clicked.connect(self.run_data_analysis)
-        self.analysis_save_button = QPushButton('Save txt')
-        self.analysis_save_button.setFont(QFont('Arial', 10))
+        # self.analysis_save_button = QPushButton('Save txt')
+        # self.analysis_save_button.setFont(QFont('Arial', 10))
+        # self.analysis_save_button.clicked.connect()
                      
         startLayout.addWidget(self.analysis_start_button)
-        startLayout.addWidget(self.analysis_save_button)
+        # startLayout.addWidget(self.analysis_save_button)
         
         ### layout
         left_vertical_layout = QVBoxLayout()
@@ -1958,9 +1994,9 @@ class IFeatureOmegaGui(QTabWidget):
         self.analysis_hist_layout.addWidget(self.analysis_histogram)
         
         self.analysis_tabWidget = QTabWidget()
-        self.analysis_tabWidget.addTab(self.analysis_tableWidget, ' Cluster/Dimensionality reduction result ')
-        self.analysis_tabWidget.addTab(self.analysis_diagram_widget, ' Scatter plot ')
-        self.analysis_tabWidget.addTab(self.analysis_tableWidget_1, ' Normalizated data ')
+        # self.analysis_tabWidget.addTab(self.analysis_tableWidget, ' Cluster/Dimensionality reduction result ')
+        self.analysis_tabWidget.addTab(self.analysis_tableWidget_1, ' Analysis result ')
+        self.analysis_tabWidget.addTab(self.analysis_diagram_widget, ' Scatter plot ')        
         self.analysis_tabWidget.addTab(self.analysis_histWidget, ' Normalizated data distribution ')                
         
         ##### splitter
@@ -2042,6 +2078,8 @@ class IFeatureOmegaGui(QTabWidget):
         scatter.setText(0, 'Scatter plot')
         circular = QTreeWidgetItem(self.plotTypes)
         circular.setText(0, 'Circular plot')
+        similarity = QTreeWidgetItem(self.plotTypes)
+        similarity.setText(0, 'Similarity matrix plot')
         treeLayout.addWidget(self.plot_treeWidget)
         treeGroupBox.setLayout(treeLayout)
 
@@ -2397,6 +2435,13 @@ class IFeatureOmegaGui(QTabWidget):
             self.protein_relation = PlotWidgets.CircosWidget()
             self.protein_relation.init_data(data)
             self.protein_relation_layout.addWidget(self.protein_relation)
+
+            # draw similarity matrix
+            # self.protein_similarity_layout.removeWidget(self.protein_similarity)
+            # sip.delete(self.protein_similarity)
+            # self.protein_similarity = PlotWidgets.HeatmapWidgetSub()
+            self.protein_similarity.init_data(data)
+            # self.protein_similarity_layout.addWidget(self.protein_similarity)
             
             # other operation            
             self.setDisabled(False)
@@ -2677,6 +2722,9 @@ class IFeatureOmegaGui(QTabWidget):
             self.dna_relation.init_data(data)
             self.dna_relation_layout.addWidget(self.dna_relation)
 
+            # draw similarity matrix
+            self.dna_similarity.init_data(data)
+
             # other operation
             self.setDisabled(False)
             self.dna_progress_bar.clear()
@@ -2931,6 +2979,9 @@ class IFeatureOmegaGui(QTabWidget):
             self.rna_relation.init_data(data)
             self.rna_relation_layout.addWidget(self.rna_relation)
 
+            # draw similarity matrix
+            self.rna_similarity.init_data(data)
+
             # other operation
             self.setDisabled(False)
             self.rna_progress_bar.clear()
@@ -3115,6 +3166,9 @@ class IFeatureOmegaGui(QTabWidget):
             self.structure_relation.init_data(data)
             self.structure_relation_layout.addWidget(self.structure_relation)
 
+            # draw similarity matrix
+            self.structure_similarity.init_data(data)
+
             # other operation
             self.setDisabled(False)
             self.structure_progress_bar.clear()
@@ -3245,6 +3299,9 @@ class IFeatureOmegaGui(QTabWidget):
             self.chemical_relation = PlotWidgets.CircosWidget()
             self.chemical_relation.init_data(data)
             self.chemical_relation_layout.addWidget(self.chemical_relation)
+
+            # draw similarity matrix
+            self.chemical_similarity.init_data(data)
 
             # other operation
             # self.chemical_widget.setDisabled(False)
@@ -3411,7 +3468,7 @@ class IFeatureOmegaGui(QTabWidget):
                         QMessageBox.critical(self, 'Error', 'Calculate failed.', QMessageBox.Ok | QMessageBox.No, QMessageBox.Ok)
                         self.analysis_data.error_msg = str(e)
                         self.analysis_status = False
-                self.analysis_display_signal.emit()            
+                self.analysis_display_signal.emit()
                 self.analysis_progress_bar.clear()
             else:
                 self.analysis_progress_bar.clear()
@@ -3429,20 +3486,26 @@ class IFeatureOmegaGui(QTabWidget):
     def set_analysis_table_content(self):
         if self.analysis_type == 'Cluster algorithms':
             if self.analysis_status:
-                self.analysis_tabWidget.setTabEnabled(0, True)
+                # self.analysis_tabWidget.setTabEnabled(0, True)
                 self.analysis_tabWidget.setTabEnabled(1, True)
                 self.analysis_tabWidget.setTabEnabled(2, False)
-                self.analysis_tabWidget.setTabEnabled(3, False)
+                # self.analysis_tabWidget.setTabEnabled(3, False)
 
                 self.analysis_status_label.setText('%s calculation complete.' % self.analysis_selected_algorithm)
-                self.analysis_tableWidget.setColumnCount(2)
-                self.analysis_tableWidget.setRowCount(self.analysis_data.row)
-                self.analysis_tableWidget.setHorizontalHeaderLabels(['SampleName', 'Cluster'])
-                for i in range(self.analysis_data.row):
-                    cell = QTableWidgetItem(self.analysis_data.dataframe.index[i])
-                    self.analysis_tableWidget.setItem(i, 0, cell)
-                    cell1 = QTableWidgetItem(str(self.analysis_data.cluster_result[i]))
-                    self.analysis_tableWidget.setItem(i, 1, cell1)
+                # self.analysis_tableWidget.setColumnCount(2)
+                # self.analysis_tableWidget.setRowCount(self.analysis_data.row)
+                # self.analysis_tableWidget.setHorizontalHeaderLabels(['SampleName', 'Cluster'])
+                
+                # for i in range(self.analysis_data.row):
+                #     cell = QTableWidgetItem(self.analysis_data.dataframe.index[i])
+                #     self.analysis_tableWidget.setItem(i, 0, cell)
+                #     cell1 = QTableWidgetItem(str(self.analysis_data.cluster_result[i]))
+                #     self.analysis_tableWidget.setItem(i, 1, cell1)
+
+                tmp_analysis_data = np.hstack((self.analysis_data.dataframe.index.values.reshape((-1, 1)), 
+                    self.analysis_data.cluster_result.reshape((-1, 1))))
+                self.analysis_tableWidget_1.init_data(['Samples', 'Cluster'], tmp_analysis_data)
+
                 """ plot with Matplotlib """
                 self.analysis_diagram_layout.removeWidget(self.analysis_diagram)
                 sip.delete(self.analysis_diagram)
@@ -3460,36 +3523,39 @@ class IFeatureOmegaGui(QTabWidget):
                 self.analysis_tabWidget.setTabEnabled(0, True)
                 self.analysis_tabWidget.setTabEnabled(1, True)
                 self.analysis_tabWidget.setTabEnabled(2, False)
-                self.analysis_tabWidget.setTabEnabled(3, False)
+                # self.analysis_tabWidget.setTabEnabled(3, False)
                 
                 self.analysis_status_label.setText('%s calculation complete.' % self.analysis_selected_algorithm)                
-                self.analysis_tableWidget.setColumnCount(self.analysis_default_para['n_components'] + 1)
-                self.analysis_tableWidget.setRowCount(self.analysis_data.row)
-                self.analysis_tableWidget.setHorizontalHeaderLabels(['SampleName'] + ['PC%s' % i for i in range(1, self.analysis_default_para['n_components'] + 1)])
-                for i in range(self.analysis_data.row):
-                    cell = QTableWidgetItem(self.analysis_data.dataframe.index[i])
-                    self.analysis_tableWidget.setItem(i, 0, cell)
-                    for j in range(self.analysis_default_para['n_components']):
-                        cell = QTableWidgetItem(str(self.analysis_data.dimension_reduction_result[i][j]))
-                        self.analysis_tableWidget.setItem(i, j+1, cell)                
+                # self.analysis_tableWidget.setColumnCount(self.analysis_default_para['n_components'] + 1)
+                # self.analysis_tableWidget.setRowCount(self.analysis_data.row)
+                # self.analysis_tableWidget.setHorizontalHeaderLabels(['SampleName'] + ['PC%s' % i for i in range(1, self.analysis_default_para['n_components'] + 1)])
+                # for i in range(self.analysis_data.row):
+                #     cell = QTableWidgetItem(self.analysis_data.dataframe.index[i])
+                #     self.analysis_tableWidget.setItem(i, 0, cell)
+                #     for j in range(self.analysis_default_para['n_components']):
+                #         cell = QTableWidgetItem(str(self.analysis_data.dimension_reduction_result[i][j]))
+                #         self.analysis_tableWidget.setItem(i, j+1, cell)
+                tmp_reduction_data = np.hstack((self.analysis_data.dataframe.index.values.reshape((-1, 1)), 
+                                                self.analysis_data.dimension_reduction_result))
+                self.analysis_tableWidget_1.init_data(['SampleName'] + ['PC%s' % i for i in range(1, self.analysis_default_para['n_components'] + 1)], tmp_reduction_data)
                 """ plot with Matploglib """
                 self.analysis_diagram_layout.removeWidget(self.analysis_diagram)                
-                sip.delete(self.analysis_diagram)
-                plot_data = self.analysis_data.generate_plot_data(self.analysis_data.datalabel, self.analysis_data.cluster_plot_data)
-                self.analysis_diagram = PlotWidgets.ClusteringDiagramMatplotlib()
+                sip.delete(self.analysis_diagram)                
+                plot_data = self.analysis_data.generate_plot_data(self.analysis_data.datalabel, self.analysis_data.dimension_reduction_result)
+                self.analysis_diagram = PlotWidgets.ClusteringDiagramMatplotlibSub()
                 self.analysis_diagram.init_data('Dimension reduction', plot_data)
                 self.analysis_diagram_layout.addWidget(self.analysis_diagram)
-                self.setDisabled(False)
+                self.setDisabled(False)                
             else:
                 self.analysis_status_label.setText(str(self.analysis_data.error_msg))
                 QMessageBox.critical(self, 'Calculate failed', str(self.analysis_data.error_msg), QMessageBox.Ok | QMessageBox.No, QMessageBox.Ok)
                 self.setDisabled(False)
         else:
             if self.analysis_status:
-                self.analysis_tabWidget.setTabEnabled(0, False)
+                self.analysis_tabWidget.setTabEnabled(0, True)
                 self.analysis_tabWidget.setTabEnabled(1, False)
                 self.analysis_tabWidget.setTabEnabled(2, True)
-                self.analysis_tabWidget.setTabEnabled(3, True)
+                # self.analysis_tabWidget.setTabEnabled(3, True)
                     
                 self.analysis_status_label.setText('%s calculation complete.' %self.analysis_selected_algorithm)
                 
@@ -3508,7 +3574,7 @@ class IFeatureOmegaGui(QTabWidget):
                 self.analysis_status_label.setText(str(self.analysis_data.error_msg))
                 QMessageBox.critical(self, 'Calculate failed', str(self.analysis_data.error_msg), QMessageBox.Ok | QMessageBox.No, QMessageBox.Ok)
                 self.setDisabled(False)
-
+   
     def display_error_msg(self, err_msg):
         QMessageBox.critical(self, 'Error', str(err_msg), QMessageBox.Ok | QMessageBox.No, QMessageBox.Ok)
 
@@ -3611,6 +3677,14 @@ class IFeatureOmegaGui(QTabWidget):
                 self.plot_plt = PlotWidgets.CircosWidget()
                 self.plot_plt.init_data(data)
                 self.plot_view_layout.addWidget(self.plot_plt)
+            if self.selected_plot_type == 'Similarity matrix plot':
+                self.plot_view_layout.removeWidget(self.plot_plt)
+                sip.delete(self.plot_plt)
+                data = copy.deepcopy(self.plot_data.dataframe)
+                self.plot_plt = PlotWidgets.HeatmapWidgetSub()
+                self.plot_plt.init_data(data)
+                self.plot_view_layout.addWidget(self.plot_plt)
+
                 
 def runiFeatureOmegaGUI():
     app = QApplication(sys.argv)
