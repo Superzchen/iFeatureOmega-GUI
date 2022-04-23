@@ -140,6 +140,14 @@ class Descriptor(Sequence):
             'TTA': 60, 'TTC': 61, 'TTG': 62, 'TTT': 63
         }
 
+    def add_samples_label(self, labels_array):
+        for i in range(min(len(self.fasta_list), len(labels_array))):
+            self.fasta_list[i][2] = labels_array[i]
+        if len(self.fasta_list) != len(labels_array):
+            self.error_msg = 'The number of sample label is not equal with sample number.'
+        if len(set(labels_array)) <= 1:
+            self.error_msg = 'KNN feature needs positive and negative samples.'
+    
     """ Protein descriptors """
 
     def Protein_AAC(self):
@@ -215,7 +223,7 @@ class Descriptor(Sequence):
             self.error_msg = str(e)
             return False
 
-    def Protein_CKSAAP(self):
+    def Protein_CKSAAP_type_1(self):
         try:
             # clear
             self.encoding_array = np.array([])
@@ -251,6 +259,57 @@ class Descriptor(Sequence):
                             sum = sum + 1
                     for pair in aaPairs:
                         code.append(myDict[pair] / sum)
+                encodings.append(code)
+
+            self.encoding_array = np.array(encodings, dtype=str)
+            self.column = self.encoding_array.shape[1]
+            self.row = self.encoding_array.shape[0] - 1
+            del encodings
+            if self.encoding_array.shape[0] > 1:
+                return True
+            else:
+                return False
+        except Exception as e:
+            self.error_msg = str(e)
+            return False
+
+    def Protein_CKSAAP_type_2(self):
+        try:
+            # clear
+            self.encoding_array = np.array([])
+
+            AA = 'ACDEFGHIKLMNPQRSTVWY'
+            encodings = []
+            aaPairs = []
+            for aa1 in AA:
+                for aa2 in AA:
+                    aaPairs.append(aa1 + aa2)
+
+            header = ['SampleName', 'label']
+
+            gap = self.kw['kspace']
+            for g in range(gap + 1):
+                for aa in aaPairs:
+                    header.append('CKSAAP_' + aa + '.gap' + str(g))
+            encodings.append(header)
+
+            for i in self.fasta_list:
+                name, sequence, label = i[0], re.sub('-', '' , i[1]), i[2]
+                code = [name, label]
+                for g in range(gap + 1):
+                    myDict = {}
+                    for pair in aaPairs:
+                        myDict[pair] = 0
+                    sum = 0
+                    for index1 in range(len(sequence)):
+                        index2 = index1 + g + 1
+                        if index1 < len(sequence) and index2 < len(sequence) and sequence[index1] in AA and sequence[
+                            index2] in AA:
+                            myDict[sequence[index1] + sequence[index2]] = myDict[sequence[index1] + sequence[index2]] + 1
+                            sum = sum + 1
+                    for pair in aaPairs:
+                        # code.append(myDict[pair] / sum)
+                        code.append(myDict[pair])
                 encodings.append(code)
 
             self.encoding_array = np.array(encodings, dtype=str)
@@ -432,7 +491,7 @@ class Descriptor(Sequence):
             self.error_msg = str(e)
             return False
 
-    def Protein_DPC(self):
+    def Protein_DPC_type_1(self):
         try:
             # clear
             self.encoding_array = np.array([])
@@ -456,6 +515,45 @@ class Descriptor(Sequence):
                         sequence[j + 1]]] + 1
                 if sum(tmpCode) != 0:
                     tmpCode = [i / sum(tmpCode) for i in tmpCode]
+                code = code + tmpCode
+                encodings.append(code)
+
+            self.encoding_array = np.array(encodings, dtype=str)
+            self.column = self.encoding_array.shape[1]
+            self.row = self.encoding_array.shape[0] - 1
+            del encodings
+            if self.encoding_array.shape[0] > 1:
+                return True
+            else:
+                return False
+        except Exception as e:
+            self.error_msg = str(e)
+            return False
+
+    def Protein_DPC_type_2(self):
+        try:
+            # clear
+            self.encoding_array = np.array([])
+
+            AA = 'ACDEFGHIKLMNPQRSTVWY'
+            encodings = []
+            diPeptides = ['DPC_' + aa1 + aa2 for aa1 in AA for aa2 in AA]
+            header = ['SampleName', 'label'] + diPeptides
+            encodings.append(header)
+
+            AADict = {}
+            for i in range(len(AA)):
+                AADict[AA[i]] = i
+
+            for i in self.fasta_list:
+                name, sequence, label = i[0], re.sub('-', '', i[1]), i[2]
+                code = [name, label]
+                tmpCode = [0] * 400
+                for j in range(len(sequence) - 2 + 1):
+                    tmpCode[AADict[sequence[j]] * 20 + AADict[sequence[j + 1]]] = tmpCode[AADict[sequence[j]] * 20 + AADict[
+                        sequence[j + 1]]] + 1
+                # if sum(tmpCode) != 0:
+                #     tmpCode = [i / sum(tmpCode) for i in tmpCode]
                 code = code + tmpCode
                 encodings.append(code)
 
@@ -526,7 +624,7 @@ class Descriptor(Sequence):
             self.error_msg = str(e)
             return False
 
-    def Protein_TPC(self):
+    def Protein_TPC_type_1(self):
         try:
             # clear
             self.encoding_array = np.array([])
@@ -558,6 +656,53 @@ class Descriptor(Sequence):
                                                                                                                             j + 2]]] + 1
                 if sum(tmpCode) != 0:
                     tmpCode = [i / sum(tmpCode) for i in tmpCode]
+                code = code + tmpCode
+                encodings.append(code)
+
+            self.encoding_array = np.array(encodings, dtype=str)
+            self.column = self.encoding_array.shape[1]
+            self.row = self.encoding_array.shape[0] - 1
+            del encodings
+            if self.encoding_array.shape[0] > 1:
+                return True
+            else:
+                return False
+        except Exception as e:
+            self.error_msg = str(e)
+            return False
+
+    def Protein_TPC_type_2(self):
+        try:
+            # clear
+            self.encoding_array = np.array([])
+
+            AA = 'ACDEFGHIKLMNPQRSTVWY'
+            encodings = []
+            triPeptides = ['TPC_' + aa1 + aa2 + aa3 for aa1 in AA for aa2 in AA for aa3 in AA]
+            header = ['SampleName', 'label'] + triPeptides
+            encodings.append(header)
+
+            AADict = {}
+            for i in range(len(AA)):
+                AADict[AA[i]] = i
+
+            for i in self.fasta_list:
+                name, sequence, label = i[0], re.sub('-', '', i[1]), i[2]
+                code = [name, label]
+                tmpCode = [0] * 8000
+                for j in range(len(sequence) - 3 + 1):
+                    tmpCode[AADict[sequence[j]] * 400 + AADict[sequence[j + 1]] * 20 + AADict[sequence[j + 2]]] = tmpCode[
+                                                                                                                    AADict[
+                                                                                                                        sequence[
+                                                                                                                            j]] * 400 +
+                                                                                                                    AADict[
+                                                                                                                        sequence[
+                                                                                                                            j + 1]] * 20 +
+                                                                                                                    AADict[
+                                                                                                                        sequence[
+                                                                                                                            j + 2]]] + 1
+                # if sum(tmpCode) != 0:
+                #     tmpCode = [i / sum(tmpCode) for i in tmpCode]
                 code = code + tmpCode
                 encodings.append(code)
 
@@ -1236,7 +1381,7 @@ class Descriptor(Sequence):
                 gPair[key1 + '.' + key2] = 0
         return gPair
 
-    def Protein_CKSAAGP(self):
+    def Protein_CKSAAGP_type_1(self):
         try:
             # clear
             self.encoding_array = np.array([])
@@ -1305,7 +1450,7 @@ class Descriptor(Sequence):
             self.error_msg = str(e)
             return False
 
-    def Protein_GDPC(self):
+    def Protein_GDPC_type_1(self):
         try:
             # clear
             self.encoding_array = np.array([])
@@ -1364,7 +1509,7 @@ class Descriptor(Sequence):
             self.error_msg = str(e)
             return False
 
-    def Protein_GTPC(self):
+    def Protein_GTPC_type_1(self):
         try:
             # clear
             self.encoding_array = np.array([])
@@ -1417,6 +1562,202 @@ class Descriptor(Sequence):
                 else:
                     for t in triple:
                         code.append(myDict[t] / sum)
+                encodings.append(code)
+
+            self.encoding_array = np.array(encodings, dtype=str)
+            self.column = self.encoding_array.shape[1]
+            self.row = self.encoding_array.shape[0] - 1
+            del encodings
+            if self.encoding_array.shape[0] > 1:
+                return True
+            else:
+                return False
+        except Exception as e:
+            self.error_msg = str(e)
+            return False
+
+    def Protein_CKSAAGP_type_2(self):
+        try:
+            # clear
+            self.encoding_array = np.array([])
+            gap = self.kw['kspace']
+
+            group = {
+                'alphaticr': 'GAVLMI',
+                'aromatic': 'FYW',
+                'postivecharger': 'KRH',
+                'negativecharger': 'DE',
+                'uncharger': 'STCPNQ'
+            }
+
+            AA = 'ARNDCQEGHILKMFPSTWYV'
+
+            groupKey = group.keys()
+
+            index = {}
+            for key in groupKey:
+                for aa in group[key]:
+                    index[aa] = key
+
+            gPairIndex = []
+            for key1 in groupKey:
+                for key2 in groupKey:
+                    gPairIndex.append(key1 + '.' + key2)
+
+            encodings = []
+            header = ['SampleName', 'label']
+            for g in range(gap + 1):
+                for p in gPairIndex:
+                    header.append('CKSAAGP_' + p + '.gap' + str(g))
+            encodings.append(header)
+
+            for i in self.fasta_list:
+                name, sequence, label = i[0], re.sub('-', '', i[1]), i[2]
+                code = [name, label]
+                for g in range(gap + 1):
+                    gPair = self.generateGroupPairs(groupKey)
+                    sum = 0
+                    for p1 in range(len(sequence)):
+                        p2 = p1 + g + 1
+                        if p2 < len(sequence) and sequence[p1] in AA and sequence[p2] in AA:
+                            gPair[index[sequence[p1]] + '.' + index[sequence[p2]]] = gPair[
+                                                                                        index[sequence[p1]] + '.' + index[
+                                                                                            sequence[p2]]] + 1
+                            sum = sum + 1
+
+                    if sum == 0:
+                        for gp in gPairIndex:
+                            code.append(0)
+                    else:
+                        for gp in gPairIndex:
+                            # code.append(gPair[gp] / sum)
+                            code.append(gPair[gp])
+                encodings.append(code)
+
+            self.encoding_array = np.array(encodings, dtype=str)
+            self.column = self.encoding_array.shape[1]
+            self.row = self.encoding_array.shape[0] - 1
+            del encodings
+            if self.encoding_array.shape[0] > 1:
+                return True
+            else:
+                return False
+        except Exception as e:
+            self.error_msg = str(e)
+            return False
+
+    def Protein_GDPC_type_2(self):
+        try:
+            # clear
+            self.encoding_array = np.array([])
+
+            group = {
+                'alphaticr': 'GAVLMI',
+                'aromatic': 'FYW',
+                'postivecharger': 'KRH',
+                'negativecharger': 'DE',
+                'uncharger': 'STCPNQ'
+            }
+
+            groupKey = group.keys()
+            baseNum = len(groupKey)
+            dipeptide = [g1 + '.' + g2 for g1 in groupKey for g2 in groupKey]            
+
+            index = {}
+            for key in groupKey:
+                for aa in group[key]:
+                    index[aa] = key
+
+            encodings = []
+            header = ['SampleName', 'label'] + ['GDPC_{0}'.format(i) for i in dipeptide]        
+            encodings.append(header)
+
+            for i in self.fasta_list:
+                name, sequence, label = i[0], re.sub('-', '', i[1]), i[2]
+
+                code = [name, label]
+                myDict = {}
+                for t in dipeptide:
+                    myDict[t] = 0
+
+                sum = 0
+                for j in range(len(sequence) - 2 + 1):
+                    myDict[index[sequence[j]] + '.' + index[sequence[j + 1]]] = myDict[index[sequence[j]] + '.' + index[sequence[j + 1]]] + 1
+                    sum = sum + 1
+
+                if sum == 0:
+                    for t in dipeptide:
+                        code.append(0)
+                else:
+                    for t in dipeptide:
+                        code.append(myDict[t])
+                encodings.append(code)
+
+            self.encoding_array = np.array(encodings, dtype=str)
+            self.column = self.encoding_array.shape[1]
+            self.row = self.encoding_array.shape[0] - 1
+            del encodings
+            if self.encoding_array.shape[0] > 1:
+                return True
+            else:
+                return False
+        except Exception as e:
+            self.error_msg = str(e)
+            return False
+
+    def Protein_GTPC_type_2(self):
+        try:
+            # clear
+            self.encoding_array = np.array([])
+
+            group = {
+                'alphaticr': 'GAVLMI',
+                'aromatic': 'FYW',
+                'postivecharger': 'KRH',
+                'negativecharger': 'DE',
+                'uncharger': 'STCPNQ'
+            }
+
+            groupKey = group.keys()
+            baseNum = len(groupKey)
+            triple = [g1 + '.' + g2 + '.' + g3 for g1 in groupKey for g2 in groupKey for g3 in groupKey]
+
+            index = {}
+            for key in groupKey:
+                for aa in group[key]:
+                    index[aa] = key
+
+            encodings = []
+            header = ['SampleName', 'label'] + ['GTPC_{0}'.format(i) for i in triple]
+            encodings.append(header)
+
+            for i in self.fasta_list:
+                name, sequence, label = i[0], re.sub('-', '', i[1]), i[2]
+
+                code = [name, label]
+                myDict = {}
+                for t in triple:
+                    myDict[t] = 0
+
+                sum = 0
+                for j in range(len(sequence) - 3 + 1):
+                    myDict[index[sequence[j]] + '.' + index[sequence[j + 1]] + '.' + index[sequence[j + 2]]] = myDict[index[
+                                                                                                                        sequence[
+                                                                                                                            j]] + '.' +
+                                                                                                                    index[
+                                                                                                                        sequence[
+                                                                                                                            j + 1]] + '.' +
+                                                                                                                    index[
+                                                                                                                        sequence[
+                                                                                                                            j + 2]]] + 1
+                    sum = sum + 1
+
+                if sum == 0:
+                    for t in triple:
+                        code.append(0)
+                else:
+                    for t in triple:
+                        code.append(myDict[t])
                 encodings.append(code)
 
             self.encoding_array = np.array(encodings, dtype=str)
@@ -3104,7 +3445,7 @@ class Descriptor(Sequence):
                         distance_dict[':'.join(sorted([name_seq1, name_seq2]))] = self.CalculateDistance(sequence_1, sequence_2)
 
             encodings = []
-            header = ['#', 'label']
+            header = ['sampleName', 'label']
             for k in topK_numbers:
                 for l in tmp_label_sets:
                     header.append('Top' + str(k) + '.label' + str(l))
@@ -4355,12 +4696,86 @@ class Descriptor(Sequence):
             kmer.append(sequence[i:i + k])
         return kmer
 
-    def Kmer(self):
+    def Kmer_type_1(self):
         try:
             fastas = self.fasta_list
             k = self.kw['kmer']
             upto = False
             normalize = True
+            type = self.sequence_type
+
+            encoding = []
+            header = ['SampleName', 'label']
+            NA = 'ACGT'
+            if type in ("DNA", 'RNA'):
+                NA = 'ACGT'
+            else:
+                NA = 'ACDEFGHIKLMNPQRSTVWY'
+
+            if upto == True:
+                tmp_header = ['Sample', 'label']
+                for tmpK in range(1, k + 1):
+                    for kmer in itertools.product(NA, repeat=tmpK):
+                        header.append('Kmer_' + ''.join(kmer))
+                        tmp_header.append(''.join(kmer))
+                encoding.append(header)
+                for i in fastas:
+                    name, sequence, label = i[0], re.sub('-', '', i[1]), i[2]
+                    count = Counter()
+                    for tmpK in range(1, k + 1):
+                        kmers = self.kmerArray(sequence, tmpK)
+                        count.update(kmers)
+                        if normalize == True:
+                            for key in count:
+                                if len(key) == tmpK:
+                                    count[key] = count[key] / len(kmers)
+                    code = [name, label]
+                    for j in range(2, len(tmp_header)):
+                        if tmp_header[j] in count:
+                            code.append(count[tmp_header[j]])
+                        else:
+                            code.append(0)
+                    encoding.append(code)
+            else:
+                tmp_header = ['Sample', 'label']
+                for kmer in itertools.product(NA, repeat=k):
+                    header.append('Kmer_' + ''.join(kmer))
+                    tmp_header.append(''.join(kmer))
+                encoding.append(header)
+                for i in fastas:
+                    name, sequence, label = i[0], re.sub('-', '', i[1]), i[2]
+                    kmers = self.kmerArray(sequence, k)
+                    count = Counter()
+                    count.update(kmers)
+                    if normalize == True:
+                        for key in count:
+                            count[key] = count[key] / len(kmers)
+                    code = [name, label]
+                    for j in range(2, len(tmp_header)):
+                        if tmp_header[j] in count:
+                            code.append(count[tmp_header[j]])
+                        else:
+                            code.append(0)
+                    encoding.append(code)
+            self.encoding_array = np.array([])
+            self.encoding_array = np.array(encoding, dtype=str)
+            self.column = self.encoding_array.shape[1]
+            self.row = self.encoding_array.shape[0] - 1
+            del encoding
+            if self.encoding_array.shape[0] > 1:
+                return True
+            else:
+                return False
+        except Exception as e:
+            self.error_msg = str(e)
+            return False
+
+    def Kmer_type_2(self):
+        try:
+            fastas = self.fasta_list
+            k = self.kw['kmer']
+            upto = False
+            normalize = False
             type = self.sequence_type
 
             encoding = []
@@ -4562,12 +4977,98 @@ class Descriptor(Sequence):
             rckmerList.add(sorted([kmer, ''.join([myDict[nc] for nc in kmer[::-1]])])[0])
         return sorted(rckmerList)
 
-    def RCKmer(self):
+    def RCKmer_type_1(self):
         try:
             fastas = self.fasta_list
             k = self.kw['kmer']
             upto = False
             normalize = True
+
+            encoding = []
+            header = ['SampleName', 'label']
+            NA = 'ACGT'
+
+            if upto == True:
+                for tmpK in range(1, k + 1):
+                    tmpHeader = []
+                    for kmer in itertools.product(NA, repeat=tmpK):
+                        tmpHeader.append(''.join(kmer))
+                    header = header + self.generateRCKmer(tmpHeader)
+                myDict = {}
+                for kmer in header[2:]:
+                    rckmer = self.RC(kmer)
+                    if kmer != rckmer:
+                        myDict[rckmer] = kmer
+                encoding.append(header)
+                for i in fastas:
+                    name, sequence, label = i[0], re.sub('-', '', i[1]), i[2]
+                    count = Counter()
+                    for tmpK in range(1, k + 1):
+                        kmers = self.kmerArray(sequence, tmpK)
+                        for j in range(len(kmers)):
+                            if kmers[j] in myDict:
+                                kmers[j] = myDict[kmers[j]]
+                        count.update(kmers)
+                        if normalize == True:
+                            for key in count:
+                                if len(key) == tmpK:
+                                    count[key] = count[key] / len(kmers)
+                    code = [name, label]
+                    for j in range(2, len(header)):
+                        if header[j] in count:
+                            code.append(count[header[j]])
+                        else:
+                            code.append(0)
+                    encoding.append(code)
+            else:
+                tmpHeader = []
+                for kmer in itertools.product(NA, repeat=k):
+                    tmpHeader.append(''.join(kmer))
+                header = header + self.generateRCKmer(tmpHeader)
+                myDict = {}
+                for kmer in header[2:]:
+                    rckmer = self.RC(kmer)
+                    if kmer != rckmer:
+                        myDict[rckmer] = kmer
+
+                encoding.append(header)
+                for i in fastas:
+                    name, sequence, label = i[0], re.sub('-', '', i[1]), i[2]
+                    kmers = self.kmerArray(sequence, k)
+                    for j in range(len(kmers)):
+                        if kmers[j] in myDict:
+                            kmers[j] = myDict[kmers[j]]
+                    count = Counter()
+                    count.update(kmers)
+                    if normalize == True:
+                        for key in count:
+                            count[key] = count[key] / len(kmers)
+                    code = [name, label]
+                    for j in range(2, len(header)):
+                        if header[j] in count:
+                            code.append(count[header[j]])
+                        else:
+                            code.append(0)
+                    encoding.append(code)
+            self.encoding_array = np.array([])
+            self.encoding_array = np.array(encoding, dtype=str)
+            self.column = self.encoding_array.shape[1]
+            self.row = self.encoding_array.shape[0] - 1
+            del encoding
+            if self.encoding_array.shape[0] > 1:
+                return True
+            else:
+                return False
+        except Exception as e:
+            self.error_msg = str(e)
+            return False
+
+    def RCKmer_type_2(self):
+        try:
+            fastas = self.fasta_list
+            k = self.kw['kmer']
+            upto = False
+            normalize = False
 
             encoding = []
             header = ['SampleName', 'label']
@@ -4906,7 +5407,7 @@ class Descriptor(Sequence):
             self.error_msg = str(e)
             return False
 
-    def CKSNAP(self):
+    def CKSNAP_type_1(self):
         try:
             gap = self.kw['kspace']
             if self.minimum_length_without_minus < gap + 2:
@@ -4943,6 +5444,57 @@ class Descriptor(Sequence):
                             sum = sum + 1
                     for pair in aaPairs:
                         code.append(myDict[pair] / sum)
+                encodings.append(code)
+            self.encoding_array = np.array([])
+            self.encoding_array = np.array(encodings, dtype=str)
+            self.column = self.encoding_array.shape[1]
+            self.row = self.encoding_array.shape[0] - 1
+            del encodings
+            if self.encoding_array.shape[0] > 1:
+                return True
+            else:
+                return False
+        except Exception as e:
+            self.error_msg = str(e)
+            return False
+
+    def CKSNAP_type_2(self):
+        try:
+            gap = self.kw['kspace']
+            if self.minimum_length_without_minus < gap + 2:
+                self.error_msg = 'CKSNAP - all the sequence length should be larger than the (gap value) + 2 = %s.' % (
+                        gap + 2)
+                return False
+
+            AA = 'ACGT'
+            encodings = []
+            aaPairs = []
+            for aa1 in AA:
+                for aa2 in AA:
+                    aaPairs.append(aa1 + aa2)
+
+            header = ['SampleName', 'label']
+            for g in range(gap + 1):
+                for aa in aaPairs:
+                    header.append('CKSNAP_' + aa + '.gap' + str(g))
+            encodings.append(header)
+
+            for i in self.fasta_list:
+                name, sequence, label = i[0], i[1], i[2]
+                code = [name, label]
+                for g in range(gap + 1):
+                    myDict = {}
+                    for pair in aaPairs:
+                        myDict[pair] = 0
+                    sum = 0
+                    for index1 in range(len(sequence)):
+                        index2 = index1 + g + 1
+                        if index1 < len(sequence) and index2 < len(sequence) and sequence[index1] in AA and sequence[
+                            index2] in AA:
+                            myDict[sequence[index1] + sequence[index2]] = myDict[sequence[index1] + sequence[index2]] + 1
+                            sum = sum + 1
+                    for pair in aaPairs:
+                        code.append(myDict[pair])
                 encodings.append(code)
             self.encoding_array = np.array([])
             self.encoding_array = np.array(encodings, dtype=str)

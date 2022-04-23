@@ -67,14 +67,19 @@ class IFeatureOmegaGui(QTabWidget):
         self.display_error_signal.connect(self.display_error_msg)
         self.display_warning_signal.connect(self.display_warning_msg)
 
+        # all
+        self.sample_labels = []
+
         # Protein
         self.protein_sequence_file = None
         self.protein_selected_descriptors = set([])
         self.protein_para_dict = {
             'EAAC': {'sliding_window': 5},
-            'CKSAAP': {'kspace': 3},
+            'CKSAAP type 1': {'kspace': 3},
+            'CKSAAP type 2': {'kspace': 3},
             'EGAAC': {'sliding_window': 5},
-            'CKSAAGP': {'kspace': 3},
+            'CKSAAGP type 1': {'kspace': 3},
+            'CKSAAGP type 2': {'kspace': 3},
             'AAIndex': {'aaindex': 'ANDN920101;ARGP820101;ARGP820102;ARGP820103;BEGF750101;BEGF750102;BEGF750103;BHAR880101'},
             'NMBroto': {'aaindex': 'ANDN920101;ARGP820101;ARGP820102;ARGP820103;BEGF750101;BEGF750102;BEGF750103;BHAR880101', 'nlag': 3,},
             'Moran': {'aaindex': 'ANDN920101;ARGP820101;ARGP820102;ARGP820103;BEGF750101;BEGF750102;BEGF750103;BHAR880101', 'nlag': 3,},
@@ -119,7 +124,7 @@ class IFeatureOmegaGui(QTabWidget):
             'g-gap': 2,
             'k-tuple': 2,
             'RAAC_clust': 1,
-            'aaindex': 'ANDN920101;ARGP820101;ARGP820102;ARGP820103;BEGF750101;BEGF750102;BEGF750103;BHAR880101',            
+            'aaindex': 'ANDN920101;ARGP820101;ARGP820102;ARGP820103;BEGF750101;BEGF750102;BEGF750103;BHAR880101',
         }
         self.protein_descriptor = None        
         self.protein_message_signal.connect(self.protein_display_message)
@@ -134,12 +139,15 @@ class IFeatureOmegaGui(QTabWidget):
         self.dna_sequence_file = None
         self.dna_selected_descriptors = set([])
         self.dna_para_dict = {
-            'Kmer': {'kmer': 3},
-            'RCKmer': {'kmer': 3},
+            'Kmer type 1': {'kmer': 3},
+            'Kmer type 2': {'kmer': 3},
+            'RCKmer type 1': {'kmer': 3},
+            'RCKmer type 2': {'kmer': 3},
             'Mismatch': {'kmer': 3, 'mismatch': 1},
             'Subsequence': {'kmer': 3, 'delta': 0},
             'ENAC': {'sliding_window': 5},
-            'CKSNAP': {'kspace': 3},
+            'CKSNAP type 1': {'kspace': 3},
+            'CKSNAP type 2': {'kspace': 3},
             'DPCP': {'Di-DNA-Phychem': 'Twist;Tilt;Roll;Shift;Slide;Rise'},
             'DPCP type2': {'Di-DNA-Phychem': 'Twist;Tilt;Roll;Shift;Slide;Rise'},
             'TPCP': {'Tri-DNA-Phychem': 'Dnase I;Bendability (DNAse)'},
@@ -183,12 +191,14 @@ class IFeatureOmegaGui(QTabWidget):
         self.rna_sequence_file = None
         self.rna_selected_descriptors = set([])
         self.rna_para_dict = {
-            'Kmer': {'kmer': 3},
+            'Kmer type 1': {'kmer': 3},
+            'Kmer type 2': {'kmer': 3},
             'RCKmer': {'kmer': 3},
             'Mismatch': {'kmer': 3, 'mismatch': 1},
             'Subsequence': {'kmer': 3, 'delta': 0},
             'ENAC': {'sliding_window': 5},
-            'CKSNAP': {'kspace': 3},
+            'CKSNAP type 1': {'kspace': 3},
+            'CKSNAP type 2': {'kspace': 3},
             'DPCP': {'Di-RNA-Phychem': 'Rise (RNA);Roll (RNA);Shift (RNA);Slide (RNA);Tilt (RNA);Twist (RNA)'},
             'DPCP type2': {'Di-RNA-Phychem': 'Rise (RNA);Roll (RNA);Shift (RNA);Slide (RNA);Tilt (RNA);Twist (RNA)'},            
             'DAC': {'Di-RNA-Phychem': 'Rise (RNA);Roll (RNA);Shift (RNA);Slide (RNA);Tilt (RNA);Twist (RNA)', 'nlag': 3},
@@ -357,7 +367,7 @@ class IFeatureOmegaGui(QTabWidget):
         self.protein_desc_treeWidget = QTreeWidget()
         self.protein_desc_treeWidget.setColumnCount(2)
         self.protein_desc_treeWidget.setMinimumWidth(300)
-        self.protein_desc_treeWidget.setColumnWidth(0, 150)
+        self.protein_desc_treeWidget.setColumnWidth(0, 250)
         self.protein_desc_treeWidget.setFont(QFont('Arial', 8))
         self.protein_desc_treeWidget.setHeaderLabels(['Codings', 'Definition'])
         self.protein_desc_treeWidget.clicked.connect(self.protein_desc_tree_clicked)
@@ -377,25 +387,40 @@ class IFeatureOmegaGui(QTabWidget):
         self.EAAC.setCheckState(0, Qt.Unchecked)
         self.EAAC.setToolTip(1, 'The EAAC feature calculates the AAC based on the sequence window\n of fixed length that continuously slides from the N- to\n C-terminus of each peptide and can be usually applied to\n encode the peptides with an equal length.')
         CKSAAP = QTreeWidgetItem(self.Protein)
-        CKSAAP.setText(0, 'CKSAAP')
-        CKSAAP.setText(1, 'Composition of k-spaced Amino Acid Pairs')
+        CKSAAP.setText(0, 'CKSAAP type 1')
+        CKSAAP.setText(1, 'Composition of k-spaced Amino Acid Pairs type 1 - normalized')
         CKSAAP.setCheckState(0, Qt.Unchecked)
-        CKSAAP.setToolTip(1, 'The CKSAAP feature encoding calculates the frequency of amino\n acid pairs separated by any k residues.')
+        CKSAAP.setToolTip(1, 'The CKSAAP type 1 feature encoding calculates the frequency of amino\n acid pairs separated by any k residues.')
+        self.CKSAAP2 = QTreeWidgetItem(self.Protein)
+        self.CKSAAP2.setText(0, 'CKSAAP type 2')
+        self.CKSAAP2.setText(1, 'Composition of k-spaced Amino Acid Pairs type 2 - raw count')
+        self.CKSAAP2.setCheckState(0, Qt.Unchecked)
+        self.CKSAAP2.setToolTip(1, 'The CKSAAP type 2 feature encoding calculates the raw count of amino\n acid pairs separated by any k residues.')
         self.DPC = QTreeWidgetItem(self.Protein)
-        self.DPC.setText(0, 'DPC')
-        self.DPC.setText(1, 'Di-Peptide Composition')
+        self.DPC.setText(0, 'DPC type 1')
+        self.DPC.setText(1, 'Di-Peptide Composition type 1 - normalized')
         self.DPC.setCheckState(0, Qt.Unchecked)
-        self.DPC.setToolTip(1, 'The DPC descriptor calculate the frequency of di-peptides.')
+        self.DPC.setToolTip(1, 'The DPC type 1 descriptor calculate the frequency of di-peptides.')
+        self.DPC2 = QTreeWidgetItem(self.Protein)
+        self.DPC2.setText(0, 'DPC type 2')
+        self.DPC2.setText(1, 'Di-Peptide Composition type 2 - raw count')
+        self.DPC2.setCheckState(0, Qt.Unchecked)
+        self.DPC2.setToolTip(1, 'The DPC type 2 descriptor calculate the raw count of di-peptides.')
         DDE = QTreeWidgetItem(self.Protein)
         DDE.setText(0, 'DDE')
         DDE.setText(1, 'Dipeptide Deviation from Expected Mean')
         DDE.setCheckState(0, Qt.Unchecked)
         DDE.setToolTip(1, 'The Dipeptide Deviation from Expected Mean feature vector is\n constructed by computing three parameters, i.e. dipeptide composition (Dc),\n theoretical mean (Tm), and theoretical variance (Tv).')
         self.TPC = QTreeWidgetItem(self.Protein)
-        self.TPC.setText(0, 'TPC')
-        self.TPC.setText(1, 'Tripeptide Composition')
+        self.TPC.setText(0, 'TPC type 1')
+        self.TPC.setText(1, 'Tripeptide Composition type 1 - normalized')
         self.TPC.setCheckState(0, Qt.Unchecked)
-        self.TPC.setToolTip(1, 'The TPC descriptor calculate the frequency of tri-peptides.')
+        self.TPC.setToolTip(1, 'The TPC type 1 descriptor calculate the frequency of tri-peptides.')
+        self.TPC2 = QTreeWidgetItem(self.Protein)
+        self.TPC2.setText(0, 'TPC type 2')
+        self.TPC2.setText(1, 'Tripeptide Composition type 2 - raw count')
+        self.TPC2.setCheckState(0, Qt.Unchecked)
+        self.TPC2.setToolTip(1, 'The TPC type 2 descriptor calculate the raw count of tri-peptides.')
         self.binary = QTreeWidgetItem(self.Protein)
         self.binary.setText(0, 'binary')
         self.binary.setText(1, 'binary')
@@ -477,20 +502,35 @@ class IFeatureOmegaGui(QTabWidget):
         self.EGAAC.setCheckState(0, Qt.Unchecked)
         self.EGAAC.setToolTip(1, 'It calculates GAAC in windows of fixed length continuously sliding\n from the N- to C-terminal of each peptide and is usually applied\n to peptides with an equal length.')
         CKSAAGP = QTreeWidgetItem(self.Protein)
-        CKSAAGP.setText(0, 'CKSAAGP')
-        CKSAAGP.setText(1, 'Composition of k-Spaced Amino Acid Group Pairs')
+        CKSAAGP.setText(0, 'CKSAAGP type 1')
+        CKSAAGP.setText(1, 'Composition of k-Spaced Amino Acid Group Pairs type 1 - normalized')
         CKSAAGP.setCheckState(0, Qt.Unchecked)
         CKSAAGP.setToolTip(1, ' It calculates the frequency of amino acid group pairs separated by any k residues.')
+        self.CKSAAGP2 = QTreeWidgetItem(self.Protein)
+        self.CKSAAGP2.setText(0, 'CKSAAGP type 2')
+        self.CKSAAGP2.setText(1, 'Composition of k-Spaced Amino Acid Group Pairs type 2 - raw count')
+        self.CKSAAGP2.setCheckState(0, Qt.Unchecked)
+        self.CKSAAGP2.setToolTip(1, ' It calculates the raw count of amino acid group pairs separated by any k residues.')
         self.GDPC = QTreeWidgetItem(self.Protein)
-        self.GDPC.setText(0, 'GDPC')
-        self.GDPC.setText(1, 'Grouped Di-Peptide Composition')
+        self.GDPC.setText(0, 'GDPC type 1')
+        self.GDPC.setText(1, 'Grouped Di-Peptide Composition type 1 - normalized')
         self.GDPC.setCheckState(0, Qt.Unchecked)
-        self.GDPC.setToolTip(1, 'GDPC calculate the frequency of amino acid group pairs.')
+        self.GDPC.setToolTip(1, 'GDPC type 1 calculate the frequency of amino acid group pairs.')
+        self.GDPC2 = QTreeWidgetItem(self.Protein)
+        self.GDPC2.setText(0, 'GDPC type 2')
+        self.GDPC2.setText(1, 'Grouped Di-Peptide Composition type 2 - raw count')
+        self.GDPC2.setCheckState(0, Qt.Unchecked)
+        self.GDPC2.setToolTip(1, 'GDPC type 2 calculate the raw count of amino acid group pairs.')
         self.GTPC = QTreeWidgetItem(self.Protein)
-        self.GTPC.setText(0, 'GTPC')
-        self.GTPC.setText(1, 'Grouped Tri-Peptide Composition')
+        self.GTPC.setText(0, 'GTPC type 1')
+        self.GTPC.setText(1, 'Grouped Tri-Peptide Composition type 1 - normalized')
         self.GTPC.setCheckState(0, Qt.Unchecked)
-        self.GTPC.setToolTip(1, 'GTPC calculate the frequency of grouped tri-peptides.')
+        self.GTPC.setToolTip(1, 'GTPC type 1 calculate the frequency of grouped tri-peptides.')
+        self.GTPC2 = QTreeWidgetItem(self.Protein)
+        self.GTPC2.setText(0, 'GTPC type 2')
+        self.GTPC2.setText(1, 'Grouped Tri-Peptide Composition type 2 - raw count')
+        self.GTPC2.setCheckState(0, Qt.Unchecked)
+        self.GTPC2.setToolTip(1, 'GTPC type 2 calculate the raw count of grouped tri-peptides.')
         self.AAIndex = QTreeWidgetItem(self.Protein)
         self.AAIndex.setText(0, 'AAIndex')
         self.AAIndex.setText(1, 'AAIndex')
@@ -711,9 +751,13 @@ class IFeatureOmegaGui(QTabWidget):
         self.PseKRAAC_type16.setText(1, 'Pseudo K-tuple Reduced Amino Acids Composition - type 16')
         self.PseKRAAC_type16.setCheckState(0, Qt.Unchecked)
         self.PseKRAAC_type16.setToolTip(1, 'Pseudo K-tuple Reduced Amino Acids Composition.')
+        proteinKNN = QTreeWidgetItem(self.Protein)
+        proteinKNN.setText(0, 'KNN')
+        proteinKNN.setText(1, 'K-nearest neighbor')
+        proteinKNN.setCheckState(0, Qt.Unchecked)
+        proteinKNN.setToolTip(1, 'The KNN descriptor depicts how much one query sample resembles other samples.')
         treeLayout.addWidget(self.protein_desc_treeWidget)
         treeGroupBox.setLayout(treeLayout)
-        
        
         # operation
         startGroupBox = QGroupBox('Operator', self)
@@ -828,7 +872,7 @@ class IFeatureOmegaGui(QTabWidget):
         self.dna_desc_treeWidget = QTreeWidget()
         self.dna_desc_treeWidget.setColumnCount(2)
         self.dna_desc_treeWidget.setMinimumWidth(300)
-        self.dna_desc_treeWidget.setColumnWidth(0, 150)
+        self.dna_desc_treeWidget.setColumnWidth(0, 200)
         self.dna_desc_treeWidget.setFont(QFont('Arial', 8))
         self.dna_desc_treeWidget.setHeaderLabels(['Codings', 'Definition'])
         self.dna_desc_treeWidget.clicked.connect(self.dna_desc_tree_clicked)
@@ -839,15 +883,25 @@ class IFeatureOmegaGui(QTabWidget):
         self.DNA.setDisabled(True)
         self.DNA.setText(0, 'DNA')
         Kmer = QTreeWidgetItem(self.DNA)
-        Kmer.setText(0, 'Kmer')
-        Kmer.setText(1, 'The occurrence frequencies of k neighboring nucleic acids')
+        Kmer.setText(0, 'Kmer type 1')
+        Kmer.setText(1, 'The occurrence frequencies of k neighboring nucleic acids type 1 - normalized')
         Kmer.setCheckState(0, Qt.Unchecked)
-        Kmer.setToolTip(1, 'For kmer descriptor, the DNA or RNA sequences are represented\n as the occurrence frequencies of k neighboring nucleic acids.')
+        Kmer.setToolTip(1, 'For kmer type 1 descriptor, the DNA or RNA sequences are represented\n as the occurrence frequencies of k neighboring nucleic acids.')
+        self.Kmer2 = QTreeWidgetItem(self.DNA)
+        self.Kmer2.setText(0, 'Kmer type 2')
+        self.Kmer2.setText(1, 'The occurrence frequencies of k neighboring nucleic acids type 2 - raw count')
+        self.Kmer2.setCheckState(0, Qt.Unchecked)
+        self.Kmer2.setToolTip(1, 'For kmer type 2 descriptor, the DNA or RNA sequences are represented\n as the raw count of k neighboring nucleic acids.')
         RCKmer = QTreeWidgetItem(self.DNA)
-        RCKmer.setText(0, 'RCKmer')
-        RCKmer.setText(1, 'Reverse Compliment Kmer')
+        RCKmer.setText(0, 'RCKmer type 1')
+        RCKmer.setText(1, 'Reverse Compliment Kmer type 1 - normalized')
         RCKmer.setCheckState(0, Qt.Unchecked)
-        RCKmer.setToolTip(1, 'The RCKmer descriptor is a variant of kmer descriptor,\n in which the kmers are not expected to be strand-specific. ')
+        RCKmer.setToolTip(1, 'The RCKmer type 1 descriptor is a variant of kmer descriptor,\n in which the kmers are not expected to be strand-specific. ')
+        self.RCKmer2 = QTreeWidgetItem(self.DNA)
+        self.RCKmer2.setText(0, 'RCKmer type 2')
+        self.RCKmer2.setText(1, 'Reverse Compliment Kmer type 2 - raw count')
+        self.RCKmer2.setCheckState(0, Qt.Unchecked)
+        self.RCKmer2.setToolTip(1, 'The RCKmer type 2 descriptor is a variant of kmer descriptor,\n in which the kmers are not expected to be strand-specific.')
         dnaMismatch = QTreeWidgetItem(self.DNA)
         dnaMismatch.setText(0, 'Mismatch')
         dnaMismatch.setText(1, 'Mismatch profile')
@@ -882,37 +936,42 @@ class IFeatureOmegaGui(QTabWidget):
         self.dnaPS2.setText(0, 'PS2')
         self.dnaPS2.setText(1, 'Position-specific of two nucleotides')
         self.dnaPS2.setCheckState(0, Qt.Unchecked)
-        self.dnaPS2.setToolTip(1, 'There are 4 x 4 = 16 pairs of adjacent pairwise nucleotides, \nthus a single variable representing one such pair gets one-hot\n (i.e. binary) encoded into 16 binary variables.')
+        self.dnaPS2.setToolTip(1, 'There are 4 x 4 = 16 pairs of adjacent pairwise nucleotides, \nthus a single variable representing one such pair gets one-hot\n (i.e. binary) encoded into 16 binary variables.')       
         self.dnaPS3 = QTreeWidgetItem(self.DNA)
         self.dnaPS3.setText(0, 'PS3')
         self.dnaPS3.setText(1, 'Position-specific of three nucleotides')
         self.dnaPS3.setCheckState(0, Qt.Unchecked)
-        self.dnaPS3.setToolTip(1, 'The PS3 descriptor is encoded for three adjacent nucleotides in a similar way with PS2.')
+        self.dnaPS3.setToolTip(1, 'The PS3 descriptor is encoded for three adjacent nucleotides in a similar way with PS2.')        
         self.dnaPS4 = QTreeWidgetItem(self.DNA)
         self.dnaPS4.setText(0, 'PS4')
         self.dnaPS4.setText(1, 'Position-specific of four nucleotides')
         self.dnaPS4.setCheckState(0, Qt.Unchecked)
-        self.dnaPS4.setToolTip(1, 'The PS4 descriptor is encoded for four adjacent nucleotides in a similar way with PS2.')
+        self.dnaPS4.setToolTip(1, 'The PS4 descriptor is encoded for four adjacent nucleotides in a similar way with PS2.')        
         CKSNAP = QTreeWidgetItem(self.DNA)
-        CKSNAP.setText(0, 'CKSNAP')
-        CKSNAP.setText(1, 'Composition of k-spaced Nucleic Acid Pairs')
+        CKSNAP.setText(0, 'CKSNAP type 1')
+        CKSNAP.setText(1, 'Composition of k-spaced Nucleic Acid Pairs type 1 - normalized')
         CKSNAP.setCheckState(0, Qt.Unchecked)
-        CKSNAP.setToolTip(1, 'The CKSNAP feature encoding calculates the frequency of nucleic acid pairs separated by any k nucleic acid.')
+        CKSNAP.setToolTip(1, 'The CKSNAP type 1 feature encoding calculates the frequency of nucleic acid pairs separated by any k nucleic acid.')
+        self.CKSNAP2 = QTreeWidgetItem(self.DNA)
+        self.CKSNAP2.setText(0, 'CKSNAP type 2')
+        self.CKSNAP2.setText(1, 'Composition of k-spaced Nucleic Acid Pairs 2 - raw count')
+        self.CKSNAP2.setCheckState(0, Qt.Unchecked)
+        self.CKSNAP2.setToolTip(1, 'The CKSNAP type 2 feature encoding calculates the raw count of nucleic acid pairs separated by any k nucleic acid.')
         self.NCP = QTreeWidgetItem(self.DNA)
         self.NCP.setText(0, 'NCP')
         self.NCP.setText(1, 'Nucleotide Chemical Property')
         self.NCP.setCheckState(0, Qt.Unchecked)
         self.NCP.setToolTip(1, 'Based on chemical properties, A can be represented by coordinates (1, 1, 1), \nC can be represented by coordinates (0, 1, 0), G can be represented by coordinates (1, 0, 0), \nU can be represented by coordinates (0, 0, 1). ')
-        # self.PSTNPss = QTreeWidgetItem(self.DNA)
-        # self.PSTNPss.setText(0, 'PSTNPss')
-        # self.PSTNPss.setText(1, 'Position-specific trinucleotide propensity based on single-strand')
-        # self.PSTNPss.setCheckState(0, Qt.Unchecked)
-        # self.PSTNPss.setToolTip(1, 'The PSTNPss descriptor usie a statistical strategy based on single-stranded characteristics of DNA or RNA.')
-        # self.PSTNPds = QTreeWidgetItem(self.DNA)
-        # self.PSTNPds.setText(0, 'PSTNPds')
-        # self.PSTNPds.setText(1, 'Position-specific trinucleotide propensity based on double-strand')
-        # self.PSTNPds.setCheckState(0, Qt.Unchecked)
-        # self.PSTNPds.setToolTip(1, 'The PSTNPds descriptor use a statistical strategy based on double-stranded characteristics of DNA according to complementary base pairing.')
+        self.PSTNPss = QTreeWidgetItem(self.DNA)
+        self.PSTNPss.setText(0, 'PSTNPss')
+        self.PSTNPss.setText(1, 'Position-specific trinucleotide propensity based on single-strand')
+        self.PSTNPss.setCheckState(0, Qt.Unchecked)
+        self.PSTNPss.setToolTip(1, 'The PSTNPss descriptor usie a statistical strategy based on single-stranded characteristics of DNA or RNA.')
+        self.PSTNPds = QTreeWidgetItem(self.DNA)
+        self.PSTNPds.setText(0, 'PSTNPds')
+        self.PSTNPds.setText(1, 'Position-specific trinucleotide propensity based on double-strand')
+        self.PSTNPds.setCheckState(0, Qt.Unchecked)
+        self.PSTNPds.setToolTip(1, 'The PSTNPds descriptor use a statistical strategy based on double-stranded characteristics of DNA according to complementary base pairing.')
         self.EIIP = QTreeWidgetItem(self.DNA)
         self.EIIP.setText(0, 'EIIP')
         self.EIIP.setText(1, 'Electron-ion interaction pseudopotentials of trinucleotide')
@@ -962,11 +1021,11 @@ class IFeatureOmegaGui(QTabWidget):
         dnaMMI.setText(0, 'MMI')
         dnaMMI.setText(1, 'Multivariate mutual information')
         dnaMMI.setCheckState(0, Qt.Unchecked)
-        # self.dnaKNN = QTreeWidgetItem(self.DNA)
-        # self.dnaKNN.setText(0, 'KNN')
-        # self.dnaKNN.setText(1, 'K-nearest neighbor')
-        # self.dnaKNN.setCheckState(0, Qt.Unchecked)
-        # self.dnaKNN.setToolTip(1, 'The K-nearest neighbor descriptor depicts how much one query sample resembles other samples.')
+        self.dnaKNN = QTreeWidgetItem(self.DNA)
+        self.dnaKNN.setText(0, 'KNN')
+        self.dnaKNN.setText(1, 'K-nearest neighbor')
+        self.dnaKNN.setCheckState(0, Qt.Unchecked)
+        self.dnaKNN.setToolTip(1, 'The K-nearest neighbor descriptor depicts how much one query sample resembles other samples.')
         dnazcurve9bit = QTreeWidgetItem(self.DNA)
         dnazcurve9bit.setText(0, 'Z_curve_9bit')
         dnazcurve9bit.setText(1, 'The Z curve parameters for frequencies of phase-specific mononucleotides')
@@ -1149,7 +1208,7 @@ class IFeatureOmegaGui(QTabWidget):
         statusGroupBox = QGroupBox('Status', self)
         statusGroupBox.setFont(QFont('Arial', 10))
         statusLayout = QHBoxLayout(statusGroupBox)
-        self.dna_status_label = QLabel('Welcome to iLearnPlus Analysis')
+        self.dna_status_label = QLabel('Welcome to iFeatureOmega.')
         self.dna_progress_bar = QLabel()
         self.dna_progress_bar.setMaximumWidth(230)
         statusLayout.addWidget(self.dna_status_label)
@@ -1183,7 +1242,7 @@ class IFeatureOmegaGui(QTabWidget):
         self.rna_desc_treeWidget = QTreeWidget()
         self.rna_desc_treeWidget.setColumnCount(2)
         self.rna_desc_treeWidget.setMinimumWidth(300)
-        self.rna_desc_treeWidget.setColumnWidth(0, 150)
+        self.rna_desc_treeWidget.setColumnWidth(0, 200)
         self.rna_desc_treeWidget.setFont(QFont('Arial', 8))        
         self.rna_desc_treeWidget.setHeaderLabels(['Codings', 'Definition'])
         self.rna_desc_treeWidget.clicked.connect(self.rna_desc_tree_clicked)
@@ -1193,10 +1252,15 @@ class IFeatureOmegaGui(QTabWidget):
         self.RNA.setText(0, 'RNA')
         self.RNA.setDisabled(True)
         RNAKmer = QTreeWidgetItem(self.RNA)
-        RNAKmer.setText(0, 'Kmer')
-        RNAKmer.setText(1, 'The occurrence frequencies of k neighboring nucleic acids')
+        RNAKmer.setText(0, 'Kmer type 1')
+        RNAKmer.setText(1, 'The occurrence frequencies of k neighboring nucleic acids type 1 - normalized')
         RNAKmer.setCheckState(0, Qt.Unchecked)
         RNAKmer.setToolTip(1, 'For kmer descriptor, the DNA or RNA sequences are represented\n as the occurrence frequencies of k neighboring nucleic acids.')
+        self.RNAKmer2 = QTreeWidgetItem(self.RNA)
+        self.RNAKmer2.setText(0, 'Kmer type 2')
+        self.RNAKmer2.setText(1, 'The occurrence frequencies of k neighboring nucleic acids type 2 - raw count')
+        self.RNAKmer2.setCheckState(0, Qt.Unchecked)
+        self.RNAKmer2.setToolTip(1, 'For kmer descriptor, the DNA or RNA sequences are represented\n as the raw count of k neighboring nucleic acids.')
         rnaMismatch = QTreeWidgetItem(self.RNA)
         rnaMismatch.setText(0, 'Mismatch')
         rnaMismatch.setText(1, 'Mismatch profile')
@@ -1227,11 +1291,11 @@ class IFeatureOmegaGui(QTabWidget):
         self.RNANCP.setText(1, 'Nucleotide Chemical Property')
         self.RNANCP.setCheckState(0, Qt.Unchecked)
         self.RNANCP.setToolTip(1, 'Based on chemical properties, A can be represented by coordinates (1, 1, 1), \nC can be represented by coordinates (0, 1, 0), G can be represented by coordinates (1, 0, 0), \nU can be represented by coordinates (0, 0, 1). ')
-        # self.RNAPSTNPss = QTreeWidgetItem(self.RNA)
-        # self.RNAPSTNPss.setText(0, 'PSTNPss')
-        # self.RNAPSTNPss.setText(1, 'Position-specific trinucleotide propensity based on single-strand')
-        # self.RNAPSTNPss.setCheckState(0, Qt.Unchecked)
-        # self.RNAPSTNPss.setToolTip(1, 'The PSTNPss descriptor usie a statistical strategy based on single-stranded characteristics of DNA or RNA.')
+        self.RNAPSTNPss = QTreeWidgetItem(self.RNA)
+        self.RNAPSTNPss.setText(0, 'PSTNPss')
+        self.RNAPSTNPss.setText(1, 'Position-specific trinucleotide propensity based on single-strand')
+        self.RNAPSTNPss.setCheckState(0, Qt.Unchecked)
+        self.RNAPSTNPss.setToolTip(1, 'The PSTNPss descriptor usie a statistical strategy based on single-stranded characteristics of DNA or RNA.')
         self.RNAbinary = QTreeWidgetItem(self.RNA)
         self.RNAbinary.setText(0, 'binary')
         self.RNAbinary.setText(1, 'RNA binary')
@@ -1253,10 +1317,15 @@ class IFeatureOmegaGui(QTabWidget):
         self.rnaPS4.setCheckState(0, Qt.Unchecked)
         self.rnaPS4.setToolTip(1, 'The PS4 descriptor is encoded for four adjacent nucleotides in a similar way with PS2.')
         RNACKSNAP = QTreeWidgetItem(self.RNA)
-        RNACKSNAP.setText(0, 'CKSNAP')
-        RNACKSNAP.setText(1, 'Composition of k-spaced Nucleic Acid Pairs')
+        RNACKSNAP.setText(0, 'CKSNAP type 1')
+        RNACKSNAP.setText(1, 'Composition of k-spaced Nucleic Acid Pairs type 1 - normalized')
         RNACKSNAP.setCheckState(0, Qt.Unchecked)
         RNACKSNAP.setToolTip(1, 'The CKSNAP feature encoding calculates the frequency of nucleic acid pairs separated by any k nucleic acid.')
+        self.RNACKSNAP2 = QTreeWidgetItem(self.RNA)
+        self.RNACKSNAP2.setText(0, 'CKSNAP type 2')
+        self.RNACKSNAP2.setText(1, 'Composition of k-spaced Nucleic Acid Pairs type 2 - raw count')
+        self.RNACKSNAP2.setCheckState(0, Qt.Unchecked)
+        self.RNACKSNAP2.setToolTip(1, 'The CKSNAP feature encoding calculates the raw count of nucleic acid pairs separated by any k nucleic acid.')
         RNAASDC = QTreeWidgetItem(self.RNA)
         RNAASDC.setText(0, 'ASDC')
         RNAASDC.setText(1, 'Adaptive skip di-nucleotide composition')
@@ -1287,11 +1356,11 @@ class IFeatureOmegaGui(QTabWidget):
         rnaMMI.setText(1, 'Multivariate mutual information')
         rnaMMI.setCheckState(0, Qt.Unchecked)
         rnaMMI.setToolTip(1, 'The MMI descriptor calculate multivariate mutual information on a DNA/RNA sequence.')
-        # self.rnaKNN = QTreeWidgetItem(self.RNA)
-        # self.rnaKNN.setText(0, 'KNN')
-        # self.rnaKNN.setText(1, 'K-nearest neighbor')
-        # self.rnaKNN.setCheckState(0, Qt.Unchecked)
-        # self.rnaKNN.setToolTip(1, 'The K-nearest neighbor descriptor depicts how much one query sample resembles other samples.')
+        self.rnaKNN = QTreeWidgetItem(self.RNA)
+        self.rnaKNN.setText(0, 'KNN')
+        self.rnaKNN.setText(1, 'K-nearest neighbor')
+        self.rnaKNN.setCheckState(0, Qt.Unchecked)
+        self.rnaKNN.setToolTip(1, 'The K-nearest neighbor descriptor depicts how much one query sample resembles other samples.')
         rnazcurve9bit = QTreeWidgetItem(self.RNA)
         rnazcurve9bit.setText(0, 'Z_curve_9bit')
         rnazcurve9bit.setText(1, 'The Z curve parameters for frequencies of phase-specific mononucleotides')
@@ -1449,7 +1518,7 @@ class IFeatureOmegaGui(QTabWidget):
         statusGroupBox = QGroupBox('Status', self)
         statusGroupBox.setFont(QFont('Arial', 10))
         statusLayout = QHBoxLayout(statusGroupBox)
-        self.rna_status_label = QLabel('Welcome to iLearnPlus Analysis')
+        self.rna_status_label = QLabel('Welcome to iFeatureOmega.')
         self.rna_progress_bar = QLabel()
         self.rna_progress_bar.setMaximumWidth(230)
         statusLayout.addWidget(self.rna_status_label)
@@ -2223,7 +2292,7 @@ class IFeatureOmegaGui(QTabWidget):
                 num, ok = QInputDialog.getInt(self, '%s setting' %desc, 'Sliding window size', 5, 2, 10, 1)
                 if ok:
                     self.protein_para_dict[desc]['sliding_window'] = num            
-            elif desc in ['CKSAAP', 'CKSAAGP', 'KSCTriad']:
+            elif desc in ['CKSAAP type 1', 'CKSAAP type 2', 'CKSAAGP type 1', 'CKSAAGP type 2', 'KSCTriad']:
                 num, ok = QInputDialog.getInt(self, '%s setting' %desc, 'K-space number', 3, 0, 5, 1)
                 if ok:
                     self.protein_para_dict[desc]['kspace'] = num
@@ -2265,12 +2334,17 @@ class IFeatureOmegaGui(QTabWidget):
                     self.protein_para_dict[desc]['lambdaValue'] = int(lambdaValue)
                     self.protein_para_dict[desc]['k-tuple'] = int(ktuple)
                     self.protein_para_dict[desc]['RAAC_clust'] = int(clust)
+            elif desc in ['KNN']:
+                self.sample_labels, ok = InputDialog.QSampleLabelInput.getValues()
 
     def show_protein_slims(self):
         if self.protein_desc_slim_button.text() == 'Show descriptor slims':
             self.AAC.setHidden(True)
             self.DPC.setHidden(True)
             self.TPC.setHidden(True)
+            self.DPC2.setHidden(True)
+            self.TPC2.setHidden(True)
+            self.CKSAAP2.setHidden(True)
             self.binary_6bit.setHidden(True)
             self.binary_5bit_type1.setHidden(True)
             self.binary_5bit_type2.setHidden(True)
@@ -2284,6 +2358,9 @@ class IFeatureOmegaGui(QTabWidget):
             self.GAAC.setHidden(True)
             self.GDPC.setHidden(True)
             self.GTPC.setHidden(True)
+            self.GDPC2.setHidden(True)
+            self.GTPC2.setHidden(True)
+            self.CKSAAGP2.setHidden(True)
             self.KSCTriad.setHidden(True)
             self.OPF_7bit_type1.setHidden(True)
             self.OPF_7bit_type2.setHidden(True)
@@ -2313,6 +2390,9 @@ class IFeatureOmegaGui(QTabWidget):
             self.AAC.setHidden(False)
             self.DPC.setHidden(False)
             self.TPC.setHidden(False)
+            self.DPC2.setHidden(False)
+            self.TPC2.setHidden(False)
+            self.CKSAAP2.setHidden(False)
             self.binary_6bit.setHidden(False)
             self.binary_5bit_type1.setHidden(False)
             self.binary_5bit_type2.setHidden(False)
@@ -2326,6 +2406,9 @@ class IFeatureOmegaGui(QTabWidget):
             self.GAAC.setHidden(False)
             self.GDPC.setHidden(False)
             self.GTPC.setHidden(False)
+            self.GDPC2.setHidden(False)
+            self.GTPC2.setHidden(False)
+            self.CKSAAGP2.setHidden(False)
             self.KSCTriad.setHidden(False)
             self.OPF_7bit_type1.setHidden(False)
             self.OPF_7bit_type2.setHidden(False)
@@ -2365,7 +2448,7 @@ class IFeatureOmegaGui(QTabWidget):
         try:
             self.protein_descriptor = None
             self.protein_encodings = None
-            self.protein_descriptor = iSequence.Descriptor(self.protein_sequence_file, self.protein_default_para)
+            self.protein_descriptor = iSequence.Descriptor(self.protein_sequence_file, self.protein_default_para)            
             if self.protein_descriptor.error_msg == '' and self.protein_descriptor.sequence_type == 'Protein' and len(self.protein_selected_descriptors) > 0:
                 self.protein_message_signal.emit('Start calculating descriptors ...')                
                 self.setDisabled(True)
@@ -2378,6 +2461,8 @@ class IFeatureOmegaGui(QTabWidget):
                     self.protein_message_signal.emit('Calculating descriptor {0} ...'.format(desc))
                     descriptor_name = re.sub(' ', '_', desc)
                     cmd = 'self.protein_descriptor.' + self.protein_descriptor.sequence_type + '_' + descriptor_name + '()'
+                    if descriptor_name == 'KNN':
+                        self.protein_descriptor.add_samples_label(self.sample_labels)
                     status = eval(cmd)
                     # merge codings
                     if status:
@@ -2520,7 +2605,7 @@ class IFeatureOmegaGui(QTabWidget):
 
     def dna_para_setting(self, desc):
         if self.dna_descriptor is not None:
-            if desc in ['Kmer', 'RCKmer']:
+            if desc in ['Kmer type 1', 'RCKmer type 1', 'Kmer type 2', 'RCKmer type 2']:
                 num, ok = QInputDialog.getInt(self, '%s setting' % desc, 'Kmer size', 3, 1, 6, 1)
                 if ok:
                     self.dna_para_dict[desc]['kmer'] = num
@@ -2528,7 +2613,7 @@ class IFeatureOmegaGui(QTabWidget):
                 num, ok = QInputDialog.getInt(self, '%s setting' %desc, 'Sliding window size', 5, 2, 10, 1)
                 if ok:
                     self.dna_para_dict[desc]['sliding_window'] = num
-            elif desc in ['CKSNAP']:
+            elif desc in ['CKSNAP', 'CKSNAP2']:
                 num, ok = QInputDialog.getInt(self, '%s setting' %desc, 'K-space number', 3, 0, 5, 1)
                 if ok:
                     self.dna_para_dict[desc]['kspace'] = num
@@ -2591,6 +2676,9 @@ class IFeatureOmegaGui(QTabWidget):
                 if ok:
                     self.dna_para_dict[desc]['nlag'] = num
                     self.dna_para_dict[desc]['Di-DNA-Phychem'] = property
+            elif desc in ['PSTNPss', 'PSTNPds', 'KNN']:
+                self.sample_labels = []
+                self.sample_labels, ok = InputDialog.QSampleLabelInput.getValues()
             else:
                 pass
 
@@ -2609,6 +2697,12 @@ class IFeatureOmegaGui(QTabWidget):
             self.DCC.setHidden(True)
             self.TAC.setHidden(True)
             self.TCC.setHidden(True)
+            self.Kmer2.setHidden(True)
+            self.RCKmer2.setHidden(True)
+            self.CKSNAP2.setHidden(True)
+            self.dnaPS22.setHidden(True)
+            self.dnaPS32.setHidden(True)
+            self.dnaPS42.setHidden(True)
             self.dna_desc_slim_button.setText('Show all descriptors')
         else:
             self.NAC.setHidden(False)
@@ -2624,6 +2718,12 @@ class IFeatureOmegaGui(QTabWidget):
             self.DCC.setHidden(False)
             self.TAC.setHidden(False)
             self.TCC.setHidden(False)
+            self.Kmer2.setHidden(False)
+            self.RCKmer2.setHidden(False)
+            self.CKSNAP2.setHidden(False)
+            self.dnaPS22.setHidden(False)
+            self.dnaPS32.setHidden(False)
+            self.dnaPS42.setHidden(False)
             self.dna_desc_slim_button.setText('Show descriptor slims')
 
     def run_calculating_dna_descriptors(self):
@@ -2663,6 +2763,8 @@ class IFeatureOmegaGui(QTabWidget):
                         cmd = 'self.dna_descriptor.' + desc + '(my_property_name, my_property_value)'
                         status = eval(cmd)
                     else:
+                        if desc in ['PSTNPss', 'PSTNPds', 'KNN']:
+                            self.dna_descriptor.add_samples_label(self.sample_labels)                            
                         descriptor_name = re.sub(' ', '_', desc)
                         cmd = 'self.dna_descriptor.' + descriptor_name + '()'
                         status = eval(cmd)               
@@ -2799,7 +2901,7 @@ class IFeatureOmegaGui(QTabWidget):
 
     def rna_para_setting(self, desc):
         if self.rna_descriptor is not None:
-            if desc in ['Kmer', 'RCKmer']:
+            if desc in ['Kmer type 1', 'Kmer type 2', 'RCKmer']:
                 num, ok = QInputDialog.getInt(self, '%s setting' % desc, 'Kmer size', 3, 1, 6, 1)
                 if ok:
                     self.rna_para_dict[desc]['kmer'] = num
@@ -2807,7 +2909,7 @@ class IFeatureOmegaGui(QTabWidget):
                 num, ok = QInputDialog.getInt(self, '%s setting' %desc, 'Sliding window size', 5, 2, 10, 1)
                 if ok:
                     self.rna_para_dict[desc]['sliding_window'] = num
-            elif desc in ['CKSNAP']:
+            elif desc in ['CKSNAP type 1', 'CKSNAP type 2']:
                 num, ok = QInputDialog.getInt(self, '%s setting' %desc, 'K-space number', 3, 0, 5, 1)
                 if ok:
                     self.rna_para_dict[desc]['kspace'] = num
@@ -2855,6 +2957,9 @@ class IFeatureOmegaGui(QTabWidget):
                 if ok:
                     self.rna_para_dict[desc]['nlag'] = num
                     self.rna_para_dict[desc]['Di-RNA-Phychem'] = property
+            elif desc in ['PSTNPss', 'PSTNPds', 'KNN']:
+                self.sample_labels = []
+                self.sample_labels, ok = InputDialog.QSampleLabelInput.getValues()
             else:
                 pass
 
@@ -2921,6 +3026,8 @@ class IFeatureOmegaGui(QTabWidget):
                         cmd = 'self.rna_descriptor.' + desc + '(my_property_name, my_property_value)'
                         status = eval(cmd)
                     else:
+                        if desc in ['PSTNPss', 'PSTNPds', 'KNN']:
+                            self.rna_descriptor.add_samples_label(self.sample_labels)  
                         descriptor_name = re.sub(' ', '_', desc)
                         cmd = 'self.rna_descriptor.' + descriptor_name + '()'
                         status = eval(cmd)

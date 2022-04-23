@@ -3756,8 +3756,47 @@ class QDRInput(QDialog):
         return n_components, sample_label_state, result == QDialog.Accepted
 
 
+class QSampleLabelInput(QDialog):
+    def __init__(self):
+        super(QSampleLabelInput, self).__init__()
+        self.setStyleSheet(qdarkstyle.load_stylesheet_pyqt5())
+        self.setWindowIcon(QIcon('images/logo.ico'))        
+        self.initUI()
+
+    def initUI(self):
+        self.setWindowFlags(Qt.WindowCloseButtonHint)
+        self.setWindowTitle('Input sample label')
+        self.setFont(QFont('Arial', 10))
+        self.resize(400, 300)
+        layout = QVBoxLayout()
+        label = QLabel('Please input sample labels (sample labels must be input as integer seperated by the sample ";"):')
+        self.text_edit = QTextEdit()
+        self.buttons = QDialogButtonBox(QDialogButtonBox.Ok | QDialogButtonBox.Cancel, Qt.Horizontal, self)
+        self.buttons.accepted.connect(self.accept)
+        self.buttons.rejected.connect(self.reject)
+        layout.addWidget(label)
+        layout.addWidget(self.text_edit)
+        layout.addWidget(self.buttons)        
+        self.setLayout(layout)
+
+    def getLabelValues(self):
+        labels = self.text_edit.toPlainText().strip()
+        try:
+            labels_list = [str(i) for i in labels.split(';')]            
+            return labels_list
+        except Exception as e:
+            return []       
+
+    @staticmethod
+    def getValues():
+        dialog = QSampleLabelInput()
+        result = dialog.exec_()
+        labels = dialog.getLabelValues()        
+        return labels, result == QDialog.Accepted
+
+
 if __name__ == '__main__':
     app = QApplication(sys.argv)
-    win = QDRInput()
+    win = QSampleLabelInput()
     win.show()
     sys.exit(app.exec_())
