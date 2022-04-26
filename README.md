@@ -151,7 +151,7 @@ Please refer to [*iFeatureOmega* manual](https://github.com/Superzchen/iFeatureO
 ## Citation
 If you find *iFeatureOmega* useful, please kindly cite the following paper:
 
-Zhen Chen, Xuhan Liu, Pei Zhao, Chen Li, Yanan Wang, Fuyi Li, Tatsuya Akutsu, Chris Bain, Robin B. Gasser, Zuoren Yang*, Lukasz Kurgan*, Jiangning Song*, *iFeatureOmega* – an integrative platform for the feature engineering, visualization and analysis of features from molecular sequence, structural and ligand data sets. (In preparation)
+Zhen Chen, Xuhan Liu, Pei Zhao, Chen Li, Yanan Wang, Fuyi Li, Tatsuya Akutsu, Chris Bain, Robin B. Gasser, Zuoren Yang*, Lukasz Kurgan*, Jiangning Song*, *iFeatureOmega* – an integrative platform for the feature engineering, visualization and analysis of features from molecular sequence, structural and ligand data sets. *Nucleic Acids Research* , 2022.
   
 Zhen Chen, Pei Zhao, Fuyi Li, André Leier, Tatiana T Marquez-Lago, Yanan Wang, Geoffrey I Webb, A Ian Smith, Roger J Daly*, Kuo-Chen Chou*, Jiangning Song*, *iFeature*: a Python package and web server for features extraction and selection from protein and peptide sequences. *Bioinformatics*, 2018, 34(14): 2499–2502. https://doi.org/10.1093/bioinformatics/bty140
 
